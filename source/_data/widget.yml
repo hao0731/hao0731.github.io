@@ -1,0 +1,4 @@
+bottom:
+  - name: 推薦 Blog
+    icon: fas fa-blog
+    html: <div><a href="https://hcluo.blogspot.com/" target="_blank">hcLuo Blog</a></div><div><a href="https://blog.leochen.dev/" target="_blank">Leo's Coding Life</a></div>

@@ -19,7 +19,6 @@ menu:
 social:
   fab fa-github: https://github.com/hao0731 || Github || "#hdhfbb"
   fa-solid fa-globe: https://ithelp.ithome.com.tw/users/20119338 || iT邦幫忙 || "#000000"
-  fa-solid fa-book: https://www.tenlong.com.tw/products/9786263332935 || NestJS 基礎必學實務指南：使用強大且易擴展的 Node.js 框架打造網頁應用程式 || "#000000"
 
 # Avatar
 avatar:
@@ -47,36 +46,36 @@ aside:
       # link: https://github.com/xxxxxx
   card_announcement:
     enable: true
-    content: 全世界第一本繁體中文 NestJS 入門書籍已上架，歡迎點擊上方書本圖示前往購買！
-  card_recent_post:
-    enable: true
-    limit: 5 # if set 0 will show all
-    sort: date # date or updated
-    sort_order: # Don't modify the setting unless you know how it works
+    content: 全世界第一本繁體中文 NestJS 入門書籍已上架，歡迎點擊<a href="https://www.tenlong.com.tw/products/9786263332935">這裡</a>前往購買！
   card_categories:
     enable: true
     limit: 8 # if set 0 will show all
     expand: none # none/true/false
-    sort_order: # Don't modify the setting unless you know how it works
-  card_tags:
+    sort_order: 1
+  card_recent_post:
     enable: true
-    limit: 40 # if set 0 will show all
-    color: false
-    orderby: random # Order of tags, random/name/length
-    order: 1 # Sort of order. 1, asc for ascending; -1, desc for descending
-    sort_order: # Don't modify the setting unless you know how it works
+    limit: 5 # if set 0 will show all
+    sort: date # date or updated
+    sort_order: 1
   card_archives:
     enable: true
     type: monthly # yearly or monthly
     format: MMMM YYYY # eg: YYYY年MM月
     order: -1 # Sort of order. 1, asc for ascending; -1, desc for descending
     limit: 8 # if set 0 will show all
-    sort_order: # Don't modify the setting unless you know how it works
+    sort_order: 1
+  card_tags:
+    enable: true
+    limit: 40 # if set 0 will show all
+    color: false
+    orderby: random # Order of tags, random/name/length
+    order: 1 # Sort of order. 1, asc for ascending; -1, desc for descending
+    sort_order: 1
   card_webinfo:
     enable: true
     post_count: true
     last_push_date: true
-    sort_order: # Don't modify the setting unless you know how it works
+    sort_order: 1
 
 
 # Page meta
