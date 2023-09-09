@@ -13,6 +13,7 @@ darkmode:
 
 # Menu
 menu:
+  關於我: /about || fas fa-user
 
 # Social
 social:
