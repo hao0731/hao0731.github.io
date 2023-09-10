@@ -1,0 +1,233 @@
+<!DOCTYPE html><html lang="zh-TW" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>動態載入 Web Component | HAO Lab</title><meta name="author" content="HAO"><meta name="copyright" content="HAO"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="什麼是 Web Component？Web Component 是一個封裝自定義元件的技術，讓我們可以輕易地在不同應用程式中重用這些被封裝的元件，不僅如此，Web Component 不限定應用程式使用的框架或函式庫，不論今天是 Angular 或 React，甚至是 Vanilla JavaScript 都能夠輕鬆使用。  INFO：關於 Web Component 的詳細資訊可以參考 MDN。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="動態載入 Web Component">
+<meta property="og:url" content="http://example.com/2023/09/10/0001-dynamic-load-web-component/index.html">
+<meta property="og:site_name" content="HAO Lab">
+<meta property="og:description" content="什麼是 Web Component？Web Component 是一個封裝自定義元件的技術，讓我們可以輕易地在不同應用程式中重用這些被封裝的元件，不僅如此，Web Component 不限定應用程式使用的框架或函式庫，不論今天是 Angular 或 React，甚至是 Vanilla JavaScript 都能夠輕鬆使用。  INFO：關於 Web Component 的詳細資訊可以參考 MDN。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="http://example.com/images/avatar.png">
+<meta property="article:published_time" content="2023-09-10T12:47:00.000Z">
+<meta property="article:modified_time" content="2023-09-10T12:59:19.918Z">
+<meta property="article:author" content="HAO">
+<meta property="article:tag" content="Frontend">
+<meta property="article:tag" content="Angular">
+<meta property="article:tag" content="Web Component">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/avatar.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://example.com/2023/09/10/0001-dynamic-load-web-component/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '複製成功',
+    error: '複製錯誤',
+    noSupport: '瀏覽器不支援'
+  },
+  relativeDate: {
+    homepage: true,
+    post: true
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '剛剛',
+    min: '分鐘前',
+    hour: '小時前',
+    day: '天前',
+    month: '個月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: true
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '動態載入 Web Component',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: undefined,
+  isToc: true,
+  postUpdate: '2023-09-10 20:59:19'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+    win.getCSS = (url,id = false) => new Promise((resolve, reject) => {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = url
+      if (id) link.id = id
+      link.onerror = reject
+      link.onload = link.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        link.onload = link.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(link)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+          const isLightMode = window.matchMedia('(prefers-color-scheme: light)').matches
+          const isNotSpecified = window.matchMedia('(prefers-color-scheme: no-preference)').matches
+          const hasNoSupport = !isDarkMode && !isLightMode && !isNotSpecified
+
+          if (t === undefined) {
+            if (isLightMode) activateLightMode()
+            else if (isDarkMode) activateDarkMode()
+            else if (isNotSpecified || hasNoSupport) {
+              const now = new Date()
+              const hour = now.getHours()
+              const isNight = hour <= 6 || hour >= 18
+              isNight ? activateDarkMode() : activateLightMode()
+            }
+            window.matchMedia('(prefers-color-scheme: dark)').addListener(function (e) {
+              if (saveToLocal.get('theme') === undefined) {
+                e.matches ? activateDarkMode() : activateLightMode()
+              }
+            })
+          } else if (t === 'light') activateLightMode()
+          else activateDarkMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/images/avatar.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1</div></a><a href="/tags/"><div class="headline">標籤</div><div class="length-num">3</div></a><a href="/categories/"><div class="headline">分類</div><div class="length-num">2</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/about"><i class="fa-fw fas fa-user"></i><span> 關於我</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog-info"><a href="/" title="HAO Lab"><span class="site-name">HAO Lab</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/about"><i class="fa-fw fas fa-user"></i><span> 關於我</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">動態載入 Web Component</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">發表於</span><time class="post-meta-date-created" datetime="2023-09-10T12:47:00.000Z" title="發表於 2023-09-10 20:47:00">2023-09-10</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新於</span><time class="post-meta-date-updated" datetime="2023-09-10T12:59:19.918Z" title="更新於 2023-09-10 20:59:19">2023-09-10</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Frontend/">Frontend</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Frontend/Web-Component/">Web Component</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="動態載入 Web Component"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">閱讀量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div><article class="post-content" id="article-container"><h2 id="什麼是-Web-Component？"><a href="#什麼是-Web-Component？" class="headerlink" title="什麼是 Web Component？"></a>什麼是 Web Component？</h2><p>Web Component 是一個封裝自定義元件的技術，讓我們可以輕易地在不同應用程式中重用這些被封裝的元件，<br>不僅如此，Web Component 不限定應用程式使用的框架或函式庫，不論今天是 Angular 或 React，甚至是 Vanilla JavaScript 都能夠輕鬆使用。</p>
+<blockquote>
+<p><strong>INFO</strong>：關於 Web Component 的詳細資訊可以參考 <a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/API/Web_components">MDN</a>。</p>
+</blockquote>
+<h2 id="為什麼需要-Web-Component？"><a href="#為什麼需要-Web-Component？" class="headerlink" title="為什麼需要 Web Component？"></a>為什麼需要 Web Component？</h2><p>Web Component 的問世，可以實現較理想的 <strong>微前端（Micro Frontend）</strong> 概念，在過去，會以 iframe 的形式將其他團隊開發的元件、頁面嵌入至自己的系統內來實現微前端，但這樣的做法會有很多的限制，比如：跨域、生命週期等。</p>
+<p>透過 Web Component 則可以避免這些問題，因為概念上就是將其他團隊開發的元件程式碼嵌入並串接至自己的系統裡。</p>
+<blockquote>
+<p><strong>NOTE</strong>：微前端也可以用 Module Federation 技術來實作，有興趣的話，可以參考<a target="_blank" rel="noopener" href="https://webpack.js.org/concepts/module-federation/">相關文件</a>。</p>
+</blockquote>
+<h2 id="動態載入-Web-Component"><a href="#動態載入-Web-Component" class="headerlink" title="動態載入 Web Component"></a>動態載入 Web Component</h2><p>目前常見的 Web Component 套用方式是將該元件推至 registry，提供給其他開發者安裝，甚至會針對不同的前端框架進行封裝，進而讓使用各種框架的開發者都可以用更貼近框架的做法來使用這些元件。</p>
+<p><img
+  style="max-width: 500px;"
+  src="web-component-for-framework.png"
+  alt="Web Component For Framework"
+/></p>
+<p>在某些情境下，我們可能會希望以 <strong>動態（Dynamic）</strong> 的方式將 Web Component 載入至自己的系統內使用，甚至能夠永遠使用最新版的元件，在這種較極端的情境下，就要實作一套機制來達到動態載入的效果。</p>
+<h3 id="流程設計"><a href="#流程設計" class="headerlink" title="流程設計"></a>流程設計</h3><p>以下是一個很簡單的實現流程：</p>
+<ol>
+<li>Web Component 編譯後的 Chunk 掛在 CDN 上</li>
+<li>應用程式透過 API 或設定檔取得 Web Component 的 url</li>
+<li>透過 Loader 將 Chunk 載入</li>
+<li>使用 Web Component</li>
+</ol>
+<p><img
+  style="max-width: 500px;"
+  src="web-component-dynamic-loader.png"
+  alt="Web Component Dynamic Loader"
+/></p>
+<h3 id="實作"><a href="#實作" class="headerlink" title="實作"></a>實作</h3><p>根據流程設計可以得知，動態載入 Web Component 的關鍵點在於取得 Web Component Chunk 的 url 並透過某種 Loader 來將該 Chunk 載入，這裡 <strong>僅會針對這段進行實作，其餘細節將會省略</strong>。</p>
+<blockquote>
+<p><strong>NOTE</strong>：以下實作會以 Angular 16 當作範例。</p>
+</blockquote>
+<p>為了簡化實作範疇，這裡採用設定檔的方式來設定 Web Component Chunk 的 url，Web Component 的 Chunk 也會放在 <code>assets</code> 資料夾內，以下是設定檔 <code>config.json</code> 的內容：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;webComponents&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">    <span class="punctuation">&#123;</span></span><br><span class="line">      <span class="attr">&quot;id&quot;</span><span class="punctuation">:</span> <span class="string">&quot;rainbow-block&quot;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;source&quot;</span><span class="punctuation">:</span> <span class="string">&quot;assets/webComponents/rainbow-block.js&quot;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line">  <span class="punctuation">]</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+<p>設定檔內定義了 <code>webComponents</code>欄位告訴應用程式有哪些 Web Component 需要載入，資料結構為陣列，裡面每個元素會定義 <code>id</code> 與 <code>source</code> 來註記該 Web Component Chunk 的 <code>id</code> 與 url。</p>
+<p>設置完 <code>config.json</code> 後，在專案內建立 <code>web-component-dynamic-loader.service.ts</code> 來實現動態載入 Web Component：</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ...</span></span><br><span class="line"><span class="meta">@Injectable</span>(&#123; <span class="attr">providedIn</span>: <span class="string">&#x27;root&#x27;</span> &#125;)</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> <span class="title class_">WebComponentDynamicLoaderService</span> &#123;</span><br><span class="line">  <span class="comment">// 注入 document</span></span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">readonly</span> _document = <span class="title function_">inject</span>(<span class="variable constant_">DOCUMENT</span>);</span><br><span class="line"></span><br><span class="line">  <span class="title function_">load</span>(<span class="params">id: <span class="built_in">string</span>, source: <span class="built_in">string</span></span>) &#123;</span><br><span class="line">    <span class="keyword">const</span> script = <span class="variable language_">this</span>.<span class="property">_document</span>.<span class="title function_">createElement</span>(<span class="string">&#x27;script&#x27;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 如果相同的 Web Component Chunk 已經載入，則不須做任何事</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="variable language_">this</span>.<span class="property">_document</span>.<span class="title function_">getElementById</span>(id)) &#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="title function_">of</span>(<span class="literal">null</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    script.<span class="property">src</span> = source;</span><br><span class="line">    script.<span class="property">id</span> = id;</span><br><span class="line"></span><br><span class="line">    <span class="variable language_">this</span>.<span class="property">_document</span>.<span class="property">head</span>.<span class="title function_">appendChild</span>(script);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 聽 script 的 onload 事件</span></span><br><span class="line">    <span class="keyword">return</span> fromEvent&lt;<span class="literal">null</span>&gt;(script, <span class="string">&#x27;load&#x27;</span>).<span class="title function_">pipe</span>(</span><br><span class="line">      <span class="title function_">map</span>(<span class="function">() =&gt;</span> <span class="literal">null</span>),</span><br><span class="line">      <span class="title function_">take</span>(<span class="number">1</span>)</span><br><span class="line">    );</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>實作 <code>ConfigStore</code> 存放 <code>config.json</code> 的內容：</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ...</span></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">interface</span> <span class="title class_">Config</span> &#123;</span><br><span class="line">  <span class="attr">webComponents</span>: &#123; <span class="attr">id</span>: <span class="built_in">string</span>; <span class="attr">source</span>: <span class="built_in">string</span> &#125;[];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> isNotNull = &lt;T&gt;(<span class="attr">config</span>: T | <span class="literal">null</span>): config is <span class="title class_">NonNullable</span>&lt;T&gt; =&gt;</span><br><span class="line">  config !== <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Injectable</span>(&#123; <span class="attr">providedIn</span>: <span class="string">&#x27;root&#x27;</span> &#125;)</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> <span class="title class_">ConfigStore</span> &#123;</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">readonly</span> _config$ = <span class="keyword">new</span> <span class="title class_">BehaviorSubject</span>&lt;<span class="title class_">Config</span> | <span class="literal">null</span>&gt;(<span class="literal">null</span>);</span><br><span class="line">  <span class="keyword">readonly</span> config$ = <span class="variable language_">this</span>.<span class="property">_config$</span>.<span class="title function_">pipe</span>(<span class="title function_">filter</span>(isNotNull));</span><br><span class="line"></span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">readonly</span> httpClient = <span class="title function_">inject</span>(<span class="title class_">HttpClient</span>);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 用於 APP_INITIALIZER</span></span><br><span class="line">  <span class="title function_">loadConfig</span>(<span class="params"></span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="function">() =&gt;</span> &#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="variable language_">this</span>.<span class="property">httpClient</span>.<span class="property">get</span>&lt;<span class="title class_">Config</span>&gt;(<span class="string">&#x27;assets/config.json&#x27;</span>).<span class="title function_">pipe</span>(</span><br><span class="line">        <span class="title function_">tap</span>(<span class="function">(<span class="params">config</span>) =&gt;</span> &#123;</span><br><span class="line">          <span class="variable language_">this</span>.<span class="property">_config$</span>.<span class="title function_">next</span>(config);</span><br><span class="line">        &#125;)</span><br><span class="line">      );</span><br><span class="line">    &#125;;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>接著，在 <code>app.config.ts</code> 透過 <code>APP_INITIALIZER</code> 取得 <code>config.json</code> 的內容，並在此載入 Web Component：</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ...</span></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> <span class="attr">appConfig</span>: <span class="title class_">ApplicationConfig</span> = &#123;</span><br><span class="line">  <span class="attr">providers</span>: [</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">provide</span>: <span class="variable constant_">APP_INITIALIZER</span>,</span><br><span class="line">      <span class="attr">useFactory</span>: <span class="function">(<span class="params">configStore: ConfigStore</span>) =&gt;</span> &#123;</span><br><span class="line">        <span class="comment">// 載入 config.json 並存入 ConfigStore 裡</span></span><br><span class="line">        <span class="keyword">return</span> configStore.<span class="title function_">loadConfig</span>();</span><br><span class="line">      &#125;,</span><br><span class="line">      <span class="attr">deps</span>: [<span class="title class_">ConfigStore</span>],</span><br><span class="line">      <span class="attr">multi</span>: <span class="literal">true</span>,</span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">provide</span>: <span class="variable constant_">APP_INITIALIZER</span>,</span><br><span class="line">      <span class="attr">useFactory</span>: <span class="function">(<span class="params"></span></span></span><br><span class="line"><span class="params"><span class="function">        configStore: ConfigStore,</span></span></span><br><span class="line"><span class="params"><span class="function">        loader: WebComponentDynamicLoaderService</span></span></span><br><span class="line"><span class="params"><span class="function">      </span>) =&gt;</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="function">() =&gt;</span> &#123;</span><br><span class="line">          <span class="keyword">return</span> configStore.<span class="property">config$</span>.<span class="title function_">pipe</span>(</span><br><span class="line">            <span class="title function_">take</span>(<span class="number">1</span>),</span><br><span class="line">            <span class="comment">// 當 config.json 內容載入後，會根據設定內容來載入 Web Component Chunk</span></span><br><span class="line">            <span class="title function_">concatMap</span>(<span class="function">(<span class="params">config</span>) =&gt;</span> <span class="title function_">from</span>(config.<span class="property">webComponents</span>)),</span><br><span class="line">            <span class="title function_">mergeMap</span>(<span class="function">(<span class="params">&#123; id, source &#125;</span>) =&gt;</span> loader.<span class="title function_">load</span>(id, source)),</span><br><span class="line">            <span class="title function_">toArray</span>()</span><br><span class="line">          );</span><br><span class="line">        &#125;;</span><br><span class="line">      &#125;,</span><br><span class="line">      <span class="attr">deps</span>: [<span class="title class_">ConfigStore</span>, <span class="title class_">WebComponentDynamicLoaderService</span>],</span><br><span class="line">      <span class="attr">multi</span>: <span class="literal">true</span>,</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">  ],</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>如此一來，便可以用動態的方式將 Web Component 載入。</p>
+<blockquote>
+<p><strong>NOTE</strong>：實作結果可以 clone <a target="_blank" rel="noopener" href="https://github.com/hao0731/angular-dynamic-load-web-component">這個專案</a>玩玩看。</p>
+</blockquote>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="http://example.com">HAO</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章連結: </span><span class="post-copyright-info"><a href="http://example.com/2023/09/10/0001-dynamic-load-web-component/">http://example.com/2023/09/10/0001-dynamic-load-web-component/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版權聲明: </span><span class="post-copyright-info">本部落格所有文章除特別聲明外，均採用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 許可協議。轉載請註明來自 <a href="http://example.com" target="_blank">HAO Lab</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Frontend/">Frontend</a><a class="post-meta__tags" href="/tags/Angular/">Angular</a><a class="post-meta__tags" href="/tags/Web-Component/">Web Component</a></div><div class="post_share"></div></div><nav class="pagination-post" id="pagination"></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/images/avatar.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">HAO</div><div class="author-info__description">樂於分享與熱愛學習的工程師</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1</div></a><a href="/tags/"><div class="headline">標籤</div><div class="length-num">3</div></a><a href="/categories/"><div class="headline">分類</div><div class="length-num">2</div></a></div><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/hao0731" target="_blank" title="Github"><i class="fab fa-github" style="color: #hdhfbb;"></i></a><a class="social-icon" href="https://ithelp.ithome.com.tw/users/20119338" target="_blank" title="iT邦幫忙"><i class="fa-solid fa-globe" style="color: #000000;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">全世界第一本繁體中文 NestJS 入門書籍已上架，歡迎點擊<a target="_blank" rel="noopener" href="https://www.tenlong.com.tw/products/9786263332935">這裡</a>前往購買！</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目錄</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%80%E9%BA%BC%E6%98%AF-Web-Component%EF%BC%9F"><span class="toc-number">1.</span> <span class="toc-text">什麼是 Web Component？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%82%BA%E4%BB%80%E9%BA%BC%E9%9C%80%E8%A6%81-Web-Component%EF%BC%9F"><span class="toc-number">2.</span> <span class="toc-text">為什麼需要 Web Component？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8B%95%E6%85%8B%E8%BC%89%E5%85%A5-Web-Component"><span class="toc-number">3.</span> <span class="toc-text">動態載入 Web Component</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B5%81%E7%A8%8B%E8%A8%AD%E8%A8%88"><span class="toc-number">3.1.</span> <span class="toc-text">流程設計</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AF%A6%E4%BD%9C"><span class="toc-number">3.2.</span> <span class="toc-text">實作</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/09/10/0001-dynamic-load-web-component/" title="動態載入 Web Component">動態載入 Web Component</a><time datetime="2023-09-10T12:47:00.000Z" title="發表於 2023-09-10 20:47:00">2023-09-10</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2023 By HAO</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主題 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="閱讀模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="淺色和深色模式轉換"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="單欄和雙欄切換"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="設定"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目錄"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到頂部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
