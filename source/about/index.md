@@ -10,12 +10,14 @@ date: 2023-09-09 16:19:22
       style="border-radius: 87.5px; max-width: 175px;"
     />
   </div>
-  <div>我是 HAO，目前任職於台灣積體電路製造股份有限公司，擔任 IT Engineer。</div>
+  <div>我是 HAO，目前任職於台灣積體電路製造股份有限公司，擔任 Senior IT Engineer。</div>
 </div>
 
 ## 工作經歷
 **Full Time**
 *  **TSMC IT Engineer** - 2022/07 ~
+    -  **Senior TSMC IT Engineer** - 2024/07 ~
+    -  **TSMC IT Engineer** - 2022/07 ~ 2024/06
 *  **Vertiv Taiwan Software Engineer** - 2021/02 ~ 2022/06
 *  **Perkd Taiwan Full-Stack Developer** - 2020/07 ~ 2021/02
 *  **Perkd Taiwan Front-End Intern** - 2019/07 ~ 2019/12
@@ -57,3 +59,9 @@ date: 2023-09-09 16:19:22
 * 【2020】[第 12 屆 iT 邦幫忙鐵人賽 - Software Development](https://ithelp.ithome.com.tw/users/20119338/ironman/3008) - **佳作**
 * 【2021】[第 13 屆 iT 邦幫忙鐵人賽 - Modern Web](https://ithelp.ithome.com.tw/users/20119338/ironman/3880) - **佳作**
 * 【2022】[著作 - NestJS 基礎必學實務指南：使用強大且易擴展的 Node.js 框架打造網頁應用程式](https://www.tenlong.com.tw/products/9786263332935)
+* 【2024】[第 16 屆 iT 邦幫忙鐵人賽 - Software Development](https://ithelp.ithome.com.tw/users/20119338/ironman/7743) - **優選**
+
+## 演講
+
+* 【2024】[TSMC IT Meetup - 擁抱 Angular Signal](https://tsmcitcommunitymeetup.kktix.cc/events/tsmc-it-meetup-taipei-02)
+* 【2024】[Hello World Dev Conference - NestJS 與 gRPC：快速上手指南](https://hwdc.ithome.com.tw/2024/session-page/3226)
