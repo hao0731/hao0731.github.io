@@ -87,7 +87,13 @@ $ npm install nestjs-pact @pact-foundation/pact -D
 
 ### Consumer
 
+假設 Consumer 這個專案有一個 `TodoModule`，該 Module 內有 `TodoController` 與 `TodoService` 並匯入了 `HttpModule` 來呼叫 API。下方是 `TodoController`、`TodoService` 與 `HttpService` 之間的關係，以類別圖來呈現：
 
+<img
+  style="max-height: 400px;"
+  src="consumer-class-diagram.png"
+  alt="Consumer class diagram"
+/>
 
 ### Provider
 
