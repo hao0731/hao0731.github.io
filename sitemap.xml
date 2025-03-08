@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>https://hao0731.github.io/googlead8647818dbace5f.html</loc>
+    <loc>https://hao0731.github.io/2025/03/08/0005-nestjs-pact/</loc>
     
     <lastmod>2025-03-08</lastmod>
     
@@ -11,9 +11,18 @@
   </url>
   
   <url>
+    <loc>https://hao0731.github.io/googlead8647818dbace5f.html</loc>
+    
+    <lastmod>2025-03-05</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>https://hao0731.github.io/2025/02/23/0004-nestjs-valkey/</loc>
     
-    <lastmod>2025-03-08</lastmod>
+    <lastmod>2025-02-23</lastmod>
     
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -145,6 +154,20 @@
     <priority>0.2</priority>
   </url>
   
+  <url>
+    <loc>https://hao0731.github.io/tags/Contract-Testing/</loc>
+    <lastmod>2025-03-08</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://hao0731.github.io/tags/Pact/</loc>
+    <lastmod>2025-03-08</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
 
   
   <url>
@@ -184,6 +207,13 @@
   
   <url>
     <loc>https://hao0731.github.io/categories/Backend/KrakenD/</loc>
+    <lastmod>2025-03-08</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://hao0731.github.io/categories/Backend/NestJS/Contract-Testing/</loc>
     <lastmod>2025-03-08</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
