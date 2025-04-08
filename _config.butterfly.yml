@@ -115,11 +115,17 @@ footer:
     enable: true
     since: 2023
 
+# Mermaid
 mermaid:
   enable: true
   theme:
     light: default
     dark: dark
+
+#Verification
+site_verification:
+  - name: google-site-verification
+    content: KYrzVkRYnlmuWovSkb10DDpxXEZajsUmptjAy08v9kA
 
 # 404
 error_404:
