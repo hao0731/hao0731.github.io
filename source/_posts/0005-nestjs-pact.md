@@ -89,11 +89,35 @@ $ npm install nestjs-pact @pact-foundation/pact -D
 
 假設 Consumer 這個專案有一個 `TodoModule`，該 Module 內有 `TodoController` 與 `TodoService` 並匯入了 `HttpModule` 來呼叫 API。下方是 `TodoController`、`TodoService` 與 `HttpService` 之間的關係，以類別圖來呈現：
 
-<img
-  style="max-height: 400px;"
-  src="consumer-class-diagram.png"
-  alt="Consumer class diagram"
-/>
+{% mermaid %}
+classDiagram
+  class HttpService {
+    +get(url)
+    +post(url, payload)
+    +delete(url)
+  }
+
+  class TodoService {
+    -HttpService httpService
+    -TodoConfig config
+    -String todoApiUrl
+    +createTodo(payload)
+    +getTodoById(id)
+    +completeTodoById(id, completed)
+    +deleteTodoById(id)
+  }
+
+  class TodoController {
+    -TodoService todoService
+    +createTodo(payload)
+    +getTodo(id)
+    +completeTodo(id, payload)
+    +deleteTodo(id)
+  }
+
+  TodoService --> HttpService
+  TodoController --> TodoService
+{% endmermaid %}
 
 前面有提到 Contract Testing 是驗證服務間 Interface 的測試方法，對 Consumer 而言，與 Provider 互動的元件為 `TodoService`，所以針對 `TodoService` 撰寫 Contract。那要如何開始呢？首先，會需要建立 Pact 的實例，這邊可以使用 `PactV3` 這個類，是目前的主要版本：
 
@@ -166,11 +190,34 @@ describe('Todo API Pact test', () => {
 
 假設 Provider 這個專案有一個 `TodoModule`，該 Module 內有 `TodoController`、`TodoService` 與 `TodoRepository`，其中，`TodoRepository` 會負責與資料庫進行互動。下方是 `TodoController`、`TodoService` 與 `TodoRepository` 之間的關係，以類別圖來呈現：
 
-<img
-  style="max-height: 400px;"
-  src="provider-class-diagram.png"
-  alt="Provider class diagram"
-/>
+{% mermaid %}
+classDiagram
+  class TodoRepository {
+    +createTodo(params)
+    +getTodoById(id)
+    +completeTodoById(id, completed)
+    +deleteTodoById(id)
+  }
+
+  class TodoService {
+    -TodoRepository todoRepository
+    +createTodo(payload)
+    +getTodoById(id)
+    +completeTodoById(id, completed)
+    +deleteTodoById(id)
+  }
+
+  class TodoController {
+    -TodoService todoService
+    +createTodo(payload)
+    +getTodoById(id)
+    +completeTodoById(id, payload)
+    +deleteTodoById(id)
+  }
+
+  TodoService --> TodoRepository
+  TodoController --> TodoService
+{% endmermaid %}
 
 前面有提到 Provider 在執行 Contract Testing 時，會需要啟動服務來進行驗證，但啟動服務並不是希望驗證完整的商業邏輯，只是要確定 API 的結果是符合期望的，所以需要把一些依賴去除掉，以上方範例來說，我們可以將 `TodoRepository` 透過 **樁(Stub)** 的方式進行處理。這邊先撰寫一個 `TodoTestingRepository`：
 
