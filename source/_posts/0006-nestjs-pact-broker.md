@@ -108,26 +108,35 @@ graph TD
 {% mermaid %}
 %%{init: { 'gitGraph': { 'mainBranchName': 'dev' } }}%%
 gitGraph
-  commit tag:"v0.0.1-4fc667fb"
-  commit tag:"v0.0.1-2eed1c17"
+  commit id: "4fc667fb" tag:"v0.0.1-4fc667fb"
+  commit id: "2eed1c17" tag:"v0.0.1-2eed1c17"
 
   branch feature/a
   checkout feature/a
   commit
-  commit tag:"v0.0.1-563c6421"
+  commit id: "563c6421" tag:"v0.0.1-563c6421"
   commit
   commit
   commit
-  commit tag:"v0.0.1-c517b5d3"
+  commit id: "c517b5d3" tag:"v0.0.1-c517b5d3"
 
 {% endmermaid %}
 
-
-
-### 標籤 (Tags)
-
-### Webhooks
-
 ### 矩陣 (Matrix)
 
+Matrix 是 Pact Broker 的核心功能，它是一張 Consumer 發佈契約與 Provider 驗證結果的記錄表，從這張表可以看出哪些 Consumer 版本發佈的契約在哪個 Provider 版本下是通過驗證的，進而得知 Consumer 版本與 Provider 版本之間的相容性。
+
+下方是一張範例表，從該表可以看出，Banana 這個 Provider 在釋出 `1.1.0` 的時候去驗證 Apple `1.0.0` 發佈的契約，驗證結果為不通過，就表示 Banana `1.1.0` 這個版本 **不相容** 於 Apple `1.0.0`，所以後來 Banana 釋出了 `1.1.1` 進行修復，從驗證結果來看是有正確修復的，就表示 Banana `1.1.1` 相容於 Apple `1.0.0`，而最後一筆可以看出，Apple 釋出了 `1.1.0` 也相容於 Banana `1.1.1` 版本：
+
+|Consumer|Consumer Version|Provider|Provider Version|Verification Result|
+|--------|----------------|--------|----------------|-------------------|
+|Apple   |1.0.0           |Banana  |1.0.0           |✅                 |
+|Apple   |1.0.0           |Banana  |1.1.0           |❌                 |
+|Apple   |1.0.0           |Banana  |1.1.1           |✅                 |
+|Apple   |1.1.0           |Banana  |1.1.1           |✅                 |
+
+> **補充**：Pact Broker 有提供十分強大的 Matrix UI 讓 Pacticipant 的開發者可以清楚知道上述的關係，後續會再做進一步的說明。
+
 ## 架設 Pact Broker
+
+## Pact CLI
