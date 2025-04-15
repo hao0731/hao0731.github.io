@@ -1,6 +1,6 @@
 ---
 title: NestJS 結合 Pact Broker 完善契約測試
-date: 2025-03-08 17:20:00
+date: 2025-04-15 17:20:00
 tags:
   - Backend
   - NestJS
@@ -138,5 +138,64 @@ Matrix 是 Pact Broker 的核心功能，它是一張 Consumer 發佈契約與 P
 > **補充**：Pact Broker 有提供十分強大的 Matrix UI 讓 Pacticipant 的開發者可以清楚知道上述的關係，後續會再做進一步的說明。
 
 ## 架設 Pact Broker
+
+Pact Broker 預設使用 [Postgres](https://www.postgresql.org/) 做為儲存資料的媒介。我們可以透過 Docker Compose 同時啟動 Postgres 與 Pact Broker。下方是 Docker Compose 的 YAML 範例：
+
+```yaml
+version: '3'
+services:
+  postgres:
+    image: postgres:12
+    environment:
+      POSTGRES_PASSWORD: mysecretpassword
+      POSTGRES_USER: postgres
+      POSTGRES_DB: pact_broker
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  pact-broker:
+    image: pactfoundation/pact-broker
+    ports:
+      - "9292:9292"
+    environment:
+      PACT_BROKER_DATABASE_USERNAME: postgres
+      PACT_BROKER_DATABASE_PASSWORD: mysecretpassword
+      PACT_BROKER_DATABASE_HOST: postgres
+      PACT_BROKER_DATABASE_NAME: pact_broker
+    depends_on:
+      - postgres
+```
+
+在 `postgres` 設置了三個環境變數：
+
+* `POSTGRES_PASSWORD`：用來設置 系統管理員(Superuser) 的密碼。
+* `POSTGRES_USER`：用來設置 Superuser 的名稱。
+* `POSTGRES_DB`：用來設置預設資料庫的名稱。
+
+而在 `pact-broker` 的部分設置了四個環境變數：
+
+* `PACT_BROKER_DATABASE_USERNAME`：Pact Broker 存取資料庫的使用者名稱。
+* `PACT_BROKER_DATABASE_PASSWORD`：Pact Broker 存取資料庫的使用者密碼。
+* `PACT_BROKER_DATABASE_HOST`：Pact Broker 存取的資料庫 Host 位址。
+* `PACT_BROKER_DATABASE_NAME`：Pact Broker 要存取的資料庫名稱。
+
+透過下方指令執行 Docker Compose 並架設 Pact Broker 與 Postgres：
+
+```bash
+$ docker compose up -d
+```
+
+### 初探 Pact Broker UI
+
+架設完 Pact Broker 後，打開瀏覽器存取 [http://localhost:9292/](http://localhost:9292/) 會看到下方畫面：
+
+<img
+  style="max-width: 500px;"
+  src="pact-broker-ui.png"
+  alt="Pact Broker UI"
+/>
+
 
 ## Pact CLI
