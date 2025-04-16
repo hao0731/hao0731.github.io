@@ -187,7 +187,7 @@ services:
 $ docker compose up -d
 ```
 
-### 初探 Pact Broker UI
+## 初探 Pact Broker UI
 
 架設完 Pact Broker 後，打開瀏覽器存取 [http://localhost:9292/](http://localhost:9292/) 會看到下方畫面：
 
@@ -197,5 +197,38 @@ $ docker compose up -d
   alt="Pact Broker UI"
 />
 
+畫面中呈現了 Consumer 為「Example App」與 Provider 為「Example API」的組合，並呈現最後一次的驗證結果，可以看到上面寫「1 day ago」且背景色為綠色，表示最後一次驗證是發生在一天前且驗證通過。
+
+畫面上可以看到有一個表格的圖案：
+
+<img
+  style="max-width: 500px;"
+  src="pact-broker-ui-matrix-entry.png"
+  alt="Pact Broker UI Matrix Entry"
+/>
+
+點擊後會顯示這個 Consumer、Provider 組合的 Matrix，預設情況下會顯示剛剛首頁呈現的最新一筆的驗證結果：
+
+<img
+  style="max-width: 500px;"
+  src="pact-broker-ui-matrix.png"
+  alt="Pact Broker UI Matrix"
+/>
+
+透過畫面上方的查詢表單可以查到這個 Consumer、Provider 組合的所有版本、驗證結果的 Matrix：
+
+<img
+  style="max-width: 500px;"
+  src="pact-broker-ui-matrix-all-result1.png"
+  alt="Pact Broker UI Matrix All Result 1"
+/>
+
+<img
+  style="max-width: 500px;"
+  src="pact-broker-ui-matrix-all-result2.png"
+  alt="Pact Broker UI Matrix All Result 2"
+/>
+
+從畫面中可以看到 Consumer 在版本為 `6c992f8` 的時候，Provider 並沒有執行驗證，而是到了 Consumer 發佈 `e15da45` 的兩天後，Provider 才使用 `480e5ae` 這個版本執行驗證，不過很可惜這邊出了問題所以驗證失敗，所以後續 Provider 使用 `1315e0b` 進行驗證並且結果是通過的。
 
 ## Pact CLI
