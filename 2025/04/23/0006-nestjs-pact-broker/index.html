@@ -1,0 +1,486 @@
+<!DOCTYPE html><html lang="zh-TW" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>NestJS 結合 Pact Broker 完善契約測試 | HAO Lab</title><meta name="author" content="HAO"><meta name="copyright" content="HAO"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="什麼是 Pact Broker？契約測試可以用更快、更低的成本來測試服務之間的介面是否有破壞性變更，強化服務之間介面的穩固性。但此測試方式面臨了一些挑戰：  契約管理：在微服務架構中，每個服務之間的契約可能數量很多且版本頻繁變動。需要一個集中的平台來儲存、追蹤這些契約檔案，並協助團隊理解每個契約的來源與歷史。 驗證結果管理：當 Provider 驗證 Consumer 所提交的契約時，我們需要一個">
+<meta property="og:type" content="article">
+<meta property="og:title" content="NestJS 結合 Pact Broker 完善契約測試">
+<meta property="og:url" content="https://hao0731.github.io/2025/04/23/0006-nestjs-pact-broker/index.html">
+<meta property="og:site_name" content="HAO Lab">
+<meta property="og:description" content="什麼是 Pact Broker？契約測試可以用更快、更低的成本來測試服務之間的介面是否有破壞性變更，強化服務之間介面的穩固性。但此測試方式面臨了一些挑戰：  契約管理：在微服務架構中，每個服務之間的契約可能數量很多且版本頻繁變動。需要一個集中的平台來儲存、追蹤這些契約檔案，並協助團隊理解每個契約的來源與歷史。 驗證結果管理：當 Provider 驗證 Consumer 所提交的契約時，我們需要一個">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://hao0731.github.io/images/avatar.png">
+<meta property="article:published_time" content="2025-04-23T14:40:00.000Z">
+<meta property="article:modified_time" content="2025-04-23T15:13:21.638Z">
+<meta property="article:author" content="HAO">
+<meta property="article:tag" content="Backend">
+<meta property="article:tag" content="NestJS">
+<meta property="article:tag" content="Contract Testing">
+<meta property="article:tag" content="Pact">
+<meta property="article:tag" content="Pact Broker">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://hao0731.github.io/images/avatar.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "NestJS 結合 Pact Broker 完善契約測試",
+  "url": "https://hao0731.github.io/2025/04/23/0006-nestjs-pact-broker/",
+  "image": "https://hao0731.github.io/images/avatar.png",
+  "datePublished": "2025-04-23T14:40:00.000Z",
+  "dateModified": "2025-04-23T15:13:21.638Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "HAO",
+      "url": "https://hao0731.github.io/"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://hao0731.github.io/2025/04/23/0006-nestjs-pact-broker/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><meta name="google-site-verification" content="KYrzVkRYnlmuWovSkb10DDpxXEZajsUmptjAy08v9kA"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          const mediaQueryDark = window.matchMedia('(prefers-color-scheme: dark)')
+          const mediaQueryLight = window.matchMedia('(prefers-color-scheme: light)')
+
+          if (theme === undefined) {
+            if (mediaQueryLight.matches) activateLightMode()
+            else if (mediaQueryDark.matches) activateDarkMode()
+            else {
+              const hour = new Date().getHours()
+              const isNight = hour <= 6 || hour >= 18
+              isNight ? activateDarkMode() : activateLightMode()
+            }
+            mediaQueryDark.addEventListener('change', () => {
+              if (saveToLocal.get('theme') === undefined) {
+                e.matches ? activateDarkMode() : activateLightMode()
+              }
+            })
+          } else {
+            theme === 'light' ? activateLightMode() : activateDarkMode()
+          }
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '複製成功',
+    error: '複製失敗',
+    noSupport: '瀏覽器不支援'
+  },
+  relativeDate: {
+    homepage: true,
+    post: true
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '剛剛',
+    min: '分鐘前',
+    hour: '小時前',
+    day: '天前',
+    month: '個月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '載入更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: true
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'NestJS 結合 Pact Broker 完善契約測試',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/images/avatar.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">6</div></a><a href="/tags/"><div class="headline">標籤</div><div class="length-num">12</div></a><a href="/categories/"><div class="headline">分類</div><div class="length-num">7</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/about"><i class="fa-fw fas fa-user"></i><span> 關於我</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">HAO Lab</span></a><a class="nav-page-title" href="/"><span class="site-name">NestJS 結合 Pact Broker 完善契約測試</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/about"><i class="fa-fw fas fa-user"></i><span> 關於我</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">NestJS 結合 Pact Broker 完善契約測試</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">發表於</span><time class="post-meta-date-created" datetime="2025-04-23T14:40:00.000Z" title="發表於 2025-04-23 22:40:00">2025-04-23</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新於</span><time class="post-meta-date-updated" datetime="2025-04-23T15:13:21.638Z" title="更新於 2025-04-23 23:13:21">2025-04-23</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Backend/">Backend</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Backend/NestJS/">NestJS</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Backend/NestJS/Contract-Testing/">Contract Testing</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">瀏覽量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div><article class="container post-content" id="article-container"><h2 id="什麼是-Pact-Broker？"><a href="#什麼是-Pact-Broker？" class="headerlink" title="什麼是 Pact Broker？"></a>什麼是 Pact Broker？</h2><p>契約測試可以用更快、更低的成本來測試服務之間的介面是否有破壞性變更，強化服務之間介面的穩固性。但此測試方式面臨了一些挑戰：</p>
+<ul>
+<li><strong>契約管理</strong>：在微服務架構中，每個服務之間的契約可能數量很多且版本頻繁變動。需要一個集中的平台來儲存、追蹤這些契約檔案，並協助團隊理解每個契約的來源與歷史。</li>
+<li><strong>驗證結果管理</strong>：當 Provider 驗證 Consumer 所提交的契約時，我們需要一個地方來儲存這些驗證結果，讓團隊成員可以清楚知道目前哪個版本的服務與哪個契約已經完成驗證、是否相容。</li>
+</ul>
+<p>為了解決上述問題，Pact 團隊打造了 <a target="_blank" rel="noopener" href="https://docs.pact.io/pact_broker">Pact Broker</a> 這個工具。它是一個專門設計來儲存和管理 Pact 契約與驗證結果的服務。透過 Pact Broker，我們可以更有效地管理微服務之間的契約、驗證狀態、版本關係，將其融入 CI&#x2F;CD 即可打造自動化、高效的契約測試流程。</p>
+<blockquote>
+<p><strong>補充</strong>：有關於 Pact 相關的介紹可以參考<a target="_blank" rel="noopener" href="https://docs.pact.io/">官方文件</a>或是我之前寫的<a href="https://hao0731.github.io/2025/03/08/0005-nestjs-pact/">文章</a>。</p>
+</blockquote>
+<h3 id="參與者-Pacticipants"><a href="#參與者-Pacticipants" class="headerlink" title="參與者 (Pacticipants)"></a>參與者 (Pacticipants)</h3><p><strong>參與者 (Pacticipants)</strong> 一詞是 Pact 與英文中的參與者 - Participants 合併後產生的單字。在 Pact Broker 中，最基本的單位就是參與契約測試的「服務」，也就是 Consumer 與 Provider，這些服務稱之為 Pacticipants。</p>
+<blockquote>
+<p><strong>補充</strong>：根據官方的說法，Pact Broker 的作者很後悔使用 Pacticipants 這個詞 XD</p>
+</blockquote>
+<h3 id="版本-Versioning"><a href="#版本-Versioning" class="headerlink" title="版本 (Versioning)"></a>版本 (Versioning)</h3><p>在 Pact Broker 的架構下，共有三種資源擁有版本，分別是：<strong>Consumer 應用程式的版本</strong> 、 <strong>Provider 應用程式的版本</strong> 與 <strong>契約檔案的版本</strong> 。</p>
+<h4 id="契約版本"><a href="#契約版本" class="headerlink" title="契約版本"></a>契約版本</h4><p>每一個被發佈到 Pact Broker 的契約都會有一個版本號，這塊是由 Pact Broker 自動處理的，開發人員並不需要針對契約設定版本。</p>
+<div class="mermaid-wrap"><pre class="mermaid-src" hidden>
+    graph TD
+  C0[&quot;Consumer&quot;]
+
+  subgraph Pact broker
+    P0[&quot;Contract (version:abc)&quot;]
+  end
+
+  C0 --&gt; P0
+  </pre></div>
+
+<h4 id="Consumer-應用程式的版本"><a href="#Consumer-應用程式的版本" class="headerlink" title="Consumer 應用程式的版本"></a>Consumer 應用程式的版本</h4><p>每當一份契約被發佈到 Pact Broker 時，它會跟 <strong>Consumer 的名稱</strong> 、 <strong>Consumer 應用程式的版本</strong> 與 <strong>Provider 的名稱</strong> 產生關聯。其中，Consumer 的名稱與 Provider 的名稱會在撰寫契約測試時指定，版本的部分則是 Consumer 在發佈契約時指定的版本號，這個版本號必須是唯一的。這裡值得一提的是 Pact Broker 會針對 Consumer 發佈的契約進行雜湊比對，如果發佈的契約並沒有任何異動，則會將 Consumer 應用程式的版本與已經存在的契約建立關聯。</p>
+<div class="mermaid-wrap"><pre class="mermaid-src" hidden>
+    graph TD
+  subgraph Consumer
+    C0[&quot;Consumer v0.0.0&quot;]
+    C1[&quot;Consumer v0.0.1&quot;]
+    C2[&quot;Consumer v0.0.2&quot;]
+  end
+
+  subgraph Contracts
+    P1[&quot;Contract A (hash: abc123)&quot;]
+    P2[&quot;Contract B (hash: def456)&quot;]
+  end
+
+  C0 --&gt; P1
+  C1 --&gt; P1
+  C2 --&gt; P2
+  </pre></div>
+
+<p>讓多個 Consumer 應用程式版本指向同一個版本的契約不僅可以減少重複的內容，還可以避免重複驗證的情形，舉例來說，Consumer 版本為 <code>v0.0.0</code> 與 <code>v0.0.1</code> 時，並沒有改變契約的內容，那麼假設 Provider 已經針對 <code>v0.0.0</code> 發佈的契約進行驗證且通過，<code>v0.0.1</code> 也會視為驗證通過。</p>
+<blockquote>
+<p><strong>注意</strong>：為了讓檢查重複契約的機制可以順利運作，在撰寫測試的時候，應該要 <strong>避免隨機產生資料的行為</strong> ，因為如果有隨機產生的資料，進行雜湊的時候一定會不同，就會導致明明沒有改變契約內容卻因隨機資料而判定為契約有異動的情況。</p>
+</blockquote>
+<h4 id="Provider-應用程式的版本"><a href="#Provider-應用程式的版本" class="headerlink" title="Provider 應用程式的版本"></a>Provider 應用程式的版本</h4><p>Provider 與 Consumer 一樣需要定義應用程式版本，該版本會跟 Consumer 發佈的契約產生關聯，每當 Provider 發佈新版本時，需要針對關聯的契約進行驗證，確保 Provider 的異動可以通過契約測試。</p>
+<div class="mermaid-wrap"><pre class="mermaid-src" hidden>
+    graph TD
+  subgraph Consumer
+    C0[&quot;Consumer v0.0.0&quot;]
+  end
+
+  subgraph Contracts
+    CT1[&quot;Contract A (hash: abc123)&quot;]
+  end
+
+  subgraph Provider
+    P0[&quot;Provider v0.0.0&quot;]
+    P1[&quot;Provider v0.0.1&quot;]
+  end
+
+  C0 --&gt; CT1
+  CT1 -- ❌ --- P0
+  CT1 -- ✅ --- P1
+  </pre></div>
+
+<p>從上方概念圖可以看出，Consumer 版本 <code>v0.0.0</code> 產生的契約在 Provider 版本 <code>v0.0.0</code> 時驗證失敗，後來 Provider 釋出 <code>v0.0.1</code> 重新進行驗證就通過了，這裡可以看出是 Provider 在 <code>v0.0.0</code> 時有問題，所以釋出 <code>v0.0.1</code> 進行修正。</p>
+<h4 id="Consumer-與-Provider-版本策略"><a href="#Consumer-與-Provider-版本策略" class="headerlink" title="Consumer 與 Provider 版本策略"></a>Consumer 與 Provider 版本策略</h4><p>為了發揮契約測試的最大效用，會建議不論是開發功能的 <code>feature/*</code> 分支、準備部署到 Staging 環境的 <code>release/*</code> 分支又或是正式版的 <code>main</code> 分支都執行契約測試，這樣的好處是可以確保在各個階段都能驗證介面是否符合契約內容，及早發現問題。但也代表 Consumer 與 Provider 在版本策略上需要做出改變。</p>
+<p>在過去，版本的定義時間點可能會發生在部署到某個環境之前，這就表示開發功能的 <code>feature/*</code> 分支 <strong>並不會有一個定義好的版本</strong> ，那針對需要給定 Consumer 應用程式版本的 Pact Broker 來說就不符合規則，所以要改變的策略就是 <strong>預定義版本</strong>。根據 Pact 官方建議，可以在版本上添加 Git SHA 這類唯一且可識別版本的資訊，確保版本號一定不會有重複且能夠做到預定義版本。下圖是使用 Git Graph 繪製出的預定義版本情境，可以看到除了 <code>dev</code> 分支本身的 commit 有對應的版本外，<code>feature/a</code> 這個分支上也有定義版本：</p>
+<div class="mermaid-wrap"><pre class="mermaid-src" hidden>
+    %%{init: { &#39;gitGraph&#39;: { &#39;mainBranchName&#39;: &#39;dev&#39; } }}%%
+gitGraph
+  commit id: &quot;4fc667fb&quot; tag:&quot;v0.0.1-4fc667fb&quot;
+  commit id: &quot;2eed1c17&quot; tag:&quot;v0.0.1-2eed1c17&quot;
+
+  branch feature&#x2F;a
+  checkout feature&#x2F;a
+  commit
+  commit id: &quot;563c6421&quot; tag:&quot;v0.0.1-563c6421&quot;
+  commit
+  commit
+  commit
+  commit id: &quot;c517b5d3&quot; tag:&quot;v0.0.1-c517b5d3&quot;
+
+  </pre></div>
+
+<h3 id="矩陣-Matrix"><a href="#矩陣-Matrix" class="headerlink" title="矩陣 (Matrix)"></a>矩陣 (Matrix)</h3><p>Matrix 是 Pact Broker 的核心功能，它是一張 Consumer 發佈契約與 Provider 驗證結果的記錄表，從這張表可以看出哪些 Consumer 版本發佈的契約在哪個 Provider 版本下是通過驗證的，進而得知 Consumer 版本與 Provider 版本之間的相容性。</p>
+<p>下方是一張範例表，從該表可以看出，Banana 這個 Provider 在釋出 <code>1.1.0</code> 的時候去驗證 Apple <code>1.0.0</code> 發佈的契約，驗證結果為不通過，就表示 Banana <code>1.1.0</code> 這個版本 <strong>不相容</strong> 於 Apple <code>1.0.0</code>，所以後來 Banana 釋出了 <code>1.1.1</code> 進行修復，從驗證結果來看是有正確修復的，就表示 Banana <code>1.1.1</code> 相容於 Apple <code>1.0.0</code>，而最後一筆可以看出，Apple 釋出了 <code>1.1.0</code> 也相容於 Banana <code>1.1.1</code> 版本：</p>
+<table>
+<thead>
+<tr>
+<th>Consumer</th>
+<th>Consumer Version</th>
+<th>Provider</th>
+<th>Provider Version</th>
+<th>Verification Result</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Apple</td>
+<td>1.0.0</td>
+<td>Banana</td>
+<td>1.0.0</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Apple</td>
+<td>1.0.0</td>
+<td>Banana</td>
+<td>1.1.0</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>Apple</td>
+<td>1.0.0</td>
+<td>Banana</td>
+<td>1.1.1</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Apple</td>
+<td>1.1.0</td>
+<td>Banana</td>
+<td>1.1.1</td>
+<td>✅</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>補充</strong>：Pact Broker 有提供十分強大的 Matrix UI 讓 Pacticipant 的開發者可以清楚知道上述的關係，後續會再做進一步的說明。</p>
+</blockquote>
+<h2 id="架設-Pact-Broker"><a href="#架設-Pact-Broker" class="headerlink" title="架設 Pact Broker"></a>架設 Pact Broker</h2><p>Pact Broker 預設使用 <a target="_blank" rel="noopener" href="https://www.postgresql.org/">Postgres</a> 做為儲存資料的媒介。我們可以透過 Docker Compose 同時啟動 Postgres 與 Pact Broker。下方是 Docker Compose 的 YAML 範例：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">version:</span> <span class="string">&#x27;3&#x27;</span></span><br><span class="line"><span class="attr">services:</span></span><br><span class="line">  <span class="attr">postgres:</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">postgres:12</span></span><br><span class="line">    <span class="attr">environment:</span></span><br><span class="line">      <span class="attr">POSTGRES_PASSWORD:</span> <span class="string">mysecretpassword</span></span><br><span class="line">      <span class="attr">POSTGRES_USER:</span> <span class="string">postgres</span></span><br><span class="line">      <span class="attr">POSTGRES_DB:</span> <span class="string">pact_broker</span></span><br><span class="line">    <span class="attr">ports:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">&quot;5432:5432&quot;</span></span><br><span class="line">    <span class="attr">volumes:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">pgdata:/var/lib/postgresql/data</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">pact-broker:</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">pactfoundation/pact-broker</span></span><br><span class="line">    <span class="attr">ports:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">&quot;9292:9292&quot;</span></span><br><span class="line">    <span class="attr">environment:</span></span><br><span class="line">      <span class="attr">PACT_BROKER_DATABASE_USERNAME:</span> <span class="string">postgres</span></span><br><span class="line">      <span class="attr">PACT_BROKER_DATABASE_PASSWORD:</span> <span class="string">mysecretpassword</span></span><br><span class="line">      <span class="attr">PACT_BROKER_DATABASE_HOST:</span> <span class="string">postgres</span></span><br><span class="line">      <span class="attr">PACT_BROKER_DATABASE_NAME:</span> <span class="string">pact_broker</span></span><br><span class="line">    <span class="attr">depends_on:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">postgres</span></span><br></pre></td></tr></table></figure>
+
+<p>在 <code>postgres</code> 設置了三個環境變數：</p>
+<ul>
+<li><code>POSTGRES_PASSWORD</code>：用來設置 系統管理員(Superuser) 的密碼。</li>
+<li><code>POSTGRES_USER</code>：用來設置 Superuser 的名稱。</li>
+<li><code>POSTGRES_DB</code>：用來設置預設資料庫的名稱。</li>
+</ul>
+<p>而在 <code>pact-broker</code> 的部分設置了四個環境變數：</p>
+<ul>
+<li><code>PACT_BROKER_DATABASE_USERNAME</code>：Pact Broker 存取資料庫的使用者名稱。</li>
+<li><code>PACT_BROKER_DATABASE_PASSWORD</code>：Pact Broker 存取資料庫的使用者密碼。</li>
+<li><code>PACT_BROKER_DATABASE_HOST</code>：Pact Broker 存取的資料庫 Host 位址。</li>
+<li><code>PACT_BROKER_DATABASE_NAME</code>：Pact Broker 要存取的資料庫名稱。</li>
+</ul>
+<p>透過下方指令執行 Docker Compose 並架設 Pact Broker 與 Postgres：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker compose up -d</span><br></pre></td></tr></table></figure>
+
+<h2 id="初探-Pact-Broker-UI"><a href="#初探-Pact-Broker-UI" class="headerlink" title="初探 Pact Broker UI"></a>初探 Pact Broker UI</h2><p>架設完 Pact Broker 後，打開瀏覽器存取 <a target="_blank" rel="noopener" href="http://localhost:9292/">http://localhost:9292/</a> 會看到下方畫面：</p>
+<p><img
+  style="max-width: 500px;"
+  src="pact-broker-ui.png"
+  alt="Pact Broker UI"
+/></p>
+<p>畫面中呈現了 Consumer 為「Example App」與 Provider 為「Example API」的組合，並呈現最後一次的驗證結果，可以看到上面寫「1 day ago」且背景色為綠色，表示最後一次驗證是發生在一天前且驗證通過。</p>
+<p>畫面上可以看到有一個表格的圖案：</p>
+<p><img
+  style="max-width: 500px;"
+  src="pact-broker-ui-matrix-entry.png"
+  alt="Pact Broker UI Matrix Entry"
+/></p>
+<p>點擊後會顯示這個 Consumer、Provider 組合的 Matrix，預設情況下會顯示剛剛首頁呈現的最新一筆的驗證結果：</p>
+<p><img
+  style="max-width: 500px;"
+  src="pact-broker-ui-matrix.png"
+  alt="Pact Broker UI Matrix"
+/></p>
+<p>透過畫面上方的查詢表單可以查到這個 Consumer、Provider 組合的所有版本、驗證結果的 Matrix：</p>
+<p><img
+  style="max-width: 500px;"
+  src="pact-broker-ui-matrix-all-result1.png"
+  alt="Pact Broker UI Matrix All Result 1"
+/></p>
+<p><img
+  style="max-width: 500px;"
+  src="pact-broker-ui-matrix-all-result2.png"
+  alt="Pact Broker UI Matrix All Result 2"
+/></p>
+<p>從畫面中可以看到 Consumer 在版本為 <code>6c992f8</code> 的時候，Provider 並沒有執行驗證，而是到了 Consumer 發佈 <code>e15da45</code> 的兩天後，Provider 才使用 <code>480e5ae</code> 這個版本執行驗證，不過很可惜這邊出了問題所以驗證失敗，所以後續 Provider 使用 <code>1315e0b</code> 進行驗證並且結果是通過的。</p>
+<h2 id="Pact-CLI"><a href="#Pact-CLI" class="headerlink" title="Pact CLI"></a>Pact CLI</h2><p>Pact 官方有推出 CLI 讓開發者可以透過其部署、檢索契約等操作。除了<a target="_blank" rel="noopener" href="https://github.com/pact-foundation/pact-ruby-standalone/releases">獨立安裝檔</a>外，還有推出 Docker Image 讓開發者可以更輕易地使用。透過下方指令從 DockerHub 進行下載：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker pull pactfoundation/pact-cli:latest</span><br></pre></td></tr></table></figure>
+
+<p>下載完畢後，可以透過下方指令呼叫幫助清單：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker run --<span class="built_in">rm</span> pactfoundation/pact-cli <span class="built_in">help</span></span><br></pre></td></tr></table></figure>
+
+<p><img
+  style="max-width: 500px;"
+  src="pact-cli-help.png"
+  alt="Pact CLI help"
+/></p>
+<h3 id="部署契約"><a href="#部署契約" class="headerlink" title="部署契約"></a>部署契約</h3><p>延續「<a href="https://hao0731.github.io/2025/03/08/0005-nestjs-pact/">在 NestJS 使用 Pact 實現契約測試</a>」文章中的測試，將這份契約透過 Pact CLI 發佈到 Pact Broker 上。</p>
+<blockquote>
+<p><strong>注意</strong>：請先將契約檔案產生出來。</p>
+</blockquote>
+<p>Pact CLI 發佈契約會使用 <code>publish</code> 指令，格式如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker run -it --<span class="built_in">rm</span> -w <span class="variable">$&#123;PWD&#125;</span> -v <span class="variable">$&#123;PWD&#125;</span>:<span class="variable">$&#123;PWD&#125;</span> --network=&lt;PACT_BROKER_DOCKER_NETWORK&gt; pactfoundation/pact-cli publish &lt;CONTRACT_FILE_PATH&gt; --consumer-app-version &lt;GIT_SHA&gt; --branch &lt;GIT_BRANCH&gt; --broker-base-url &lt;PACT_BROKER_URL&gt;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>注意</strong>：因為是使用 Docker 的方式來操作 Pact CLI，所以需要指定 Workspace 與 Volume，確保可以正確讀到契約檔案。</p>
+</blockquote>
+<p>從上方 <code>publish</code> 指令可以看到有許多參數，這裡一一解釋：</p>
+<ul>
+<li><code>&lt;CONTRACT_FILE_PATH&gt;</code>：契約檔案的位置。</li>
+<li><code>--consumer-app-version</code>：Consumer 發佈契約當下的應用程式版本，上方範例使用 <code>&lt;GIT_SHA&gt;</code> 作為佔位符，實際情況可以帶入該 Commit 的 Git SHA 值。</li>
+<li><code>--branch</code>：Consumer 發佈契約當下的分支。</li>
+<li><code>--broker-base-url</code>：Pact Broker 的 URL。</li>
+</ul>
+<p>下方是實際執行的畫面，可以看到執行完以後會顯示成功的訊息：</p>
+<p><img
+  style="max-width: 500px;"
+  src="pact-cli-publish.png"
+  alt="Pact CLI Publish"
+/></p>
+<p>進入 Pact Broker UI 看一下發佈的契約，可以看到有顯示出來且還沒有任何驗證結果：</p>
+<p><img
+  style="max-width: 500px;"
+  src="pact-cli-publish-result.png"
+  alt="Pact CLI Publish Result"
+/></p>
+<h2 id="整合契約驗證"><a href="#整合契約驗證" class="headerlink" title="整合契約驗證"></a>整合契約驗證</h2><p>延續「<a href="https://hao0731.github.io/2025/03/08/0005-nestjs-pact/">在 NestJS 使用 Pact 實現契約測試</a>」文章中的 Provider 測試，調整成驗證完畢就將驗證結果發佈至 Pact Broker。這邊需要調整 <code>PactProviderModule</code> 的相關設定，下方是範例程式碼：</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ...</span></span><br><span class="line"></span><br><span class="line"><span class="title function_">describe</span>(<span class="string">&#x27;Todo API Pact validation&#x27;</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line"></span><br><span class="line">  <span class="title function_">beforeAll</span>(<span class="title function_">async</span> () =&gt; &#123;</span><br><span class="line">    <span class="keyword">const</span> moduleRef = <span class="keyword">await</span> <span class="title class_">Test</span>.<span class="title function_">createTestingModule</span>(&#123;</span><br><span class="line">      <span class="attr">imports</span>: [</span><br><span class="line">        <span class="comment">// ...</span></span><br><span class="line">        <span class="title class_">PactProviderModule</span>.<span class="title function_">registerAsync</span>(&#123;</span><br><span class="line">          <span class="attr">imports</span>: [<span class="title class_">TodoTestingModule</span>],</span><br><span class="line">          <span class="attr">inject</span>: [<span class="title class_">TodoRepository</span>],</span><br><span class="line">          <span class="attr">useFactory</span>: <span class="function">(<span class="params"><span class="attr">todoRepository</span>: <span class="title class_">TodoTestingRepository</span></span>) =&gt;</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> &#123;</span><br><span class="line">              <span class="attr">stateHandlers</span>: &#123;</span><br><span class="line">                <span class="string">&#x27;The todo exists&#x27;</span>: <span class="title function_">async</span> (params) =&gt; &#123;</span><br><span class="line">                  <span class="keyword">const</span> &#123; todo &#125; = params <span class="keyword">as</span> <span class="built_in">unknown</span> <span class="keyword">as</span> &#123; <span class="attr">todo</span>: <span class="title class_">Todo</span> &#125;;</span><br><span class="line">                  <span class="keyword">return</span> <span class="title function_">lastValueFrom</span>(todoRepository.<span class="title function_">appendTodo</span>(todo));</span><br><span class="line">                &#125;,</span><br><span class="line">              &#125;,</span><br><span class="line">              <span class="attr">pactBrokerUrl</span>: <span class="string">&#x27;http://localhost:9292&#x27;</span>,</span><br><span class="line">              <span class="attr">provider</span>: <span class="string">&#x27;TodoProvider&#x27;</span>,</span><br><span class="line">              <span class="attr">providerVersion</span>: <span class="string">&#x27;ffad1f7d&#x27;</span>,</span><br><span class="line">              <span class="attr">providerVersionBranch</span>: <span class="string">&#x27;main&#x27;</span>,</span><br><span class="line">              <span class="attr">publishVerificationResult</span>: <span class="literal">true</span>,</span><br><span class="line">              <span class="attr">consumerVersionSelectors</span>: [</span><br><span class="line">                &#123; <span class="attr">mainBranch</span>: <span class="literal">true</span> &#125;,</span><br><span class="line">              ],</span><br><span class="line">            &#125;;</span><br><span class="line">          &#125;,</span><br><span class="line">        &#125;),</span><br><span class="line">      ],</span><br><span class="line">    &#125;)</span><br><span class="line">    .<span class="title function_">compile</span>();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">  &#125;);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>可以看到除了刪除 <code>pactUrls</code> 外，還新增了以下幾個設定：</p>
+<ul>
+<li><code>pactBrokerUrl</code>：Pact Broker 的 URL。</li>
+<li><code>provider</code>：Provider 的名稱。</li>
+<li><code>providerVersion</code>：Provider 的版本，建議帶入驗證當下的 Git SHA。</li>
+<li><code>providerVersionBranch</code>：驗證當下 Provider 所在的分支。</li>
+<li><code>publishVerificationResult</code>：發佈驗證結果至 Pact Broker。</li>
+<li><code>consumerVersionSelectors</code>：決定 Provider 要抓取哪些 Consumer 發佈的契約，以範例來說，設置 <code>&#123; mainBranch: true &#125;</code> 就表示會抓取每個 Consumer 於 <code>main</code> 分支發佈的契約。</li>
+</ul>
+<blockquote>
+<p><strong>補充</strong>：針對 Consumer Version Selector 可以參考 <a target="_blank" rel="noopener" href="https://docs.pact.io/pact_broker/advanced_topics/consumer_version_selectors">官方文件</a> 的說明。</p>
+</blockquote>
+<p>執行驗證後，可以在 Pact Broker 看到剛剛驗證通過的結果：</p>
+<p><img
+  style="max-width: 500px;"
+  src="pact-verification-result1.png"
+  alt="Pact CLI Publish Result"
+/></p>
+<p>點擊契約圖示可以看到更詳細的驗證結果資訊：</p>
+<p><img
+  style="max-width: 500px;"
+  src="pact-verification-result2.png"
+  alt="Pact CLI Publish Result2"
+/></p>
+<h2 id="結論"><a href="#結論" class="headerlink" title="結論"></a>結論</h2><p>透過本文的介紹，我們理解了 Pact Broker 在契約測試中是一個重要角色。它有效解決契約管理與驗證結果追蹤的難題，透過清晰的版本控管機制、雜湊比對避免重複驗證，以及整合 Matrix UI 清楚呈現服務間相容性的情況，使團隊更易於掌握服務間介面的變化及潛在風險。此外，也示範了如何透過 Docker Compose 快速部署 Pact Broker，並以 Pact CLI 和 NestJS 程式範例說明如何將契約測試融入 CI&#x2F;CD 流程。</p>
+<p>善用 Pact Broker，不僅能有效降低微服務系統在開發、測試、部署時的溝通成本，更能提升整個團隊在協作時的信心與效率。期望透過這篇教學文章，能協助大家迅速建立穩健且高度自動化的契約測試流程，進而達到更高品質的軟體交付。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://hao0731.github.io">HAO</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章連結: </span><span class="post-copyright-info"><a href="https://hao0731.github.io/2025/04/23/0006-nestjs-pact-broker/">https://hao0731.github.io/2025/04/23/0006-nestjs-pact-broker/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版權聲明: </span><span class="post-copyright-info">本部落格所有文章除特別聲明外，均採用<a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 授權協議。轉載請註明來源 <a href="https://hao0731.github.io" target="_blank">HAO Lab</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Backend/">Backend</a><a class="post-meta__tags" href="/tags/NestJS/">NestJS</a><a class="post-meta__tags" href="/tags/Contract-Testing/">Contract Testing</a><a class="post-meta__tags" href="/tags/Pact/">Pact</a><a class="post-meta__tags" href="/tags/Pact-Broker/">Pact Broker</a></div><div class="post-share"><div class="social-share" data-image="/images/avatar.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related full-width" href="/2025/03/08/0005-nestjs-pact/" title="在 NestJS 使用 Pact 實現契約測試"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">在 NestJS 使用 Pact 實現契約測試</div></div><div class="info-2"><div class="info-item-1">在微服務架構中，各個服務由不同團隊獨立開發、部署與維運，這樣的彈性雖然增加了開發效率，但也同時導致服務間互動的不確定性。如何確保每個服務在獨立更新的同時，仍能正確溝通與協作？ 契約測試(Contract Testing) 正是解決這一問題的有效工具。 什麼是 Contract Testing？Contract Testing 是一種專注於驗證服務間 介面(Interface) 正確性的自動化測試方法。此方法論會將服務區分成兩個角色：  提供者(Provider) ：提供 API 的服務。 消費者(Consumer) ：使用 Provider 提供的 API 的服務。  Provider 與 Consumer 之間會 提前 約定好 Interface，包含：請求格式、回應格式、錯誤處理機制等。這種約定可以是 OpenAPI、JSON Schema 或是其他 Contract Testing 工具來作為服務間共同遵循的標準，這套約定即 契約(Contract) 。而 Contract Testing 有兩種方法，分別是： 消費者驅動的契約測試(Consumer-Driven...</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相關推薦</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2025/03/08/0005-nestjs-pact/" title="在 NestJS 使用 Pact 實現契約測試"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-03-08</div><div class="info-item-2">在 NestJS 使用 Pact 實現契約測試</div></div><div class="info-2"><div class="info-item-1">在微服務架構中，各個服務由不同團隊獨立開發、部署與維運，這樣的彈性雖然增加了開發效率，但也同時導致服務間互動的不確定性。如何確保每個服務在獨立更新的同時，仍能正確溝通與協作？ 契約測試(Contract Testing) 正是解決這一問題的有效工具。 什麼是 Contract Testing？Contract Testing 是一種專注於驗證服務間 介面(Interface) 正確性的自動化測試方法。此方法論會將服務區分成兩個角色：  提供者(Provider) ：提供 API 的服務。 消費者(Consumer) ：使用 Provider 提供的 API 的服務。  Provider 與 Consumer 之間會 提前 約定好 Interface，包含：請求格式、回應格式、錯誤處理機制等。這種約定可以是 OpenAPI、JSON Schema 或是其他 Contract Testing 工具來作為服務間共同遵循的標準，這套約定即 契約(Contract) 。而 Contract Testing 有兩種方法，分別是： 消費者驅動的契約測試(Consumer-Driven...</div></div></div></a><a class="pagination-related" href="/2023/09/17/0002-nestjs-discovery-module/" title="你可能不知道的 NestJS 隱藏技巧：Discovery Module"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2023-09-17</div><div class="info-item-2">你可能不知道的 NestJS 隱藏技巧：Discovery Module</div></div><div class="info-2"><div class="info-item-1">在某些應用場景下，可能會需要去遍歷封裝於 模組（Module） 內的元件，比如：找出帶有特定 裝飾器（Decorator） 的元件，甚至是元件底下的方法，來預先處理一些事情，最典型的案例就是 EventEmitterModule，當某個事件觸發時，會呼叫帶有特定裝飾器的方法。  NOTE：關於 EventEmitterModule 可以參考官方文件的說明。  下方是官方 EventEmitterModule 的範例，透過 EventEmitter2 發送 order.created 事件時，會呼叫帶有 @OnEvent 裝飾器且值為 order.created 的方法： 1234567this.eventEmitter.emit(  &#x27;order.created&#x27;,  new OrderCreatedEvent(&#123;    orderId: 1,    payload: &#123;&#125;,  &#125;),);  123456789// ...@Injectable()export class OrderListener &#123; ...</div></div></div></a><a class="pagination-related" href="/2025/02/23/0004-nestjs-valkey/" title="在 NestJS 使用 Valkey 實現 Cache"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-02-23</div><div class="info-item-2">在 NestJS 使用 Valkey 實現 Cache</div></div><div class="info-2"><div class="info-item-1">什麼是 Valkey？在 2024 年時，Redis 官方宣佈要針對 License 進行異動，對於託管 Redis 的雲端服務供應商將不能免費使用 Redis，像是：AWS、Google Cloud Platform 等平台。因此，社群 fork 了 Redis 並建立開源的替代品 - Valkey。它是一個高效的鍵值儲存系統，可以用來實現 快取(Cache)、訊息佇列(Message Queue) 等功能，在運行方面，同樣也支援 獨立運作模式(Standalone) 與 叢集運作模式(Cluster) 。  圖片來源  補充：對於 Redis 異動的內容，可以參考 Will 保哥翻譯後的版本。  架設 Valkey官方有提供 Binary 與 Docker 兩種方式，這裡我們使用 Docker 來進行架設。透過下方指令將 Valkey 的 Docker Image 從 DockerHub 下載下來： 1$ docker pull valkey/valkey:8.0.2   補充：這裡指定版本為 8.0.2，若有需要可以自行換成所需的版本號。  在啟動 Valkey...</div></div></div></a><a class="pagination-related" href="/2025/01/11/0003-what-is-krakend/" title="KrakenD 簡介"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-01-11</div><div class="info-item-2">KrakenD 簡介</div></div><div class="info-2"><div class="info-item-1">什麼是 KrakenD？KrakenD 是一套開源、可擴充、高效能的 API Gateway，使用 Golang 所撰寫，透過 JSON 設定檔即可聚合多個微服務到單一 Endpoint，並能夠運用內建或社群提供的 中介軟體(Middleware) 來擴展其功能，自動完成部分繁重的工作，如：聚合(Aggregate)、轉換(Transform)、過濾(Filter)、解碼(Decode)、節流(Throttle)、身份驗證(Authenticate) 等。  圖片來源 安裝 KrakenDKrakenD 有提供多種安裝方式，其中 Docker Image 的方式是最快、最容易的。透過下方指令即可將 KrakenD 的 Docker Image 從 Docker Hub 下載下來： 1$ docker pull devopsfaith/krakend  使用下方指令即可快速啟動 KrakenD： 1$ docker run -p 8080:8080 devopsfaith/krakend  啟動後，可以透過 GET 方法存取...</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/images/avatar.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">HAO</div><div class="author-info-description">樂於分享與熱愛學習的工程師</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">6</div></a><a href="/tags/"><div class="headline">標籤</div><div class="length-num">12</div></a><a href="/categories/"><div class="headline">分類</div><div class="length-num">7</div></a></div><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/hao0731" target="_blank" title="Github"><i class="fab fa-github" style="color: #hdhfbb;"></i></a><a class="social-icon" href="https://ithelp.ithome.com.tw/users/20119338" target="_blank" title="iT邦幫忙"><i class="fa-solid fa-globe" style="color: #000000;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">全世界第一本繁體中文 NestJS 入門書籍已上架，歡迎點擊<a target="_blank" rel="noopener" href="https://www.tenlong.com.tw/products/9786263332935">這裡</a>前往購買！</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目錄</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%80%E9%BA%BC%E6%98%AF-Pact-Broker%EF%BC%9F"><span class="toc-number">1.</span> <span class="toc-text">什麼是 Pact Broker？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%83%E8%88%87%E8%80%85-Pacticipants"><span class="toc-number">1.1.</span> <span class="toc-text">參與者 (Pacticipants)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%89%88%E6%9C%AC-Versioning"><span class="toc-number">1.2.</span> <span class="toc-text">版本 (Versioning)</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%A5%91%E7%B4%84%E7%89%88%E6%9C%AC"><span class="toc-number">1.2.1.</span> <span class="toc-text">契約版本</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Consumer-%E6%87%89%E7%94%A8%E7%A8%8B%E5%BC%8F%E7%9A%84%E7%89%88%E6%9C%AC"><span class="toc-number">1.2.2.</span> <span class="toc-text">Consumer 應用程式的版本</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Provider-%E6%87%89%E7%94%A8%E7%A8%8B%E5%BC%8F%E7%9A%84%E7%89%88%E6%9C%AC"><span class="toc-number">1.2.3.</span> <span class="toc-text">Provider 應用程式的版本</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Consumer-%E8%88%87-Provider-%E7%89%88%E6%9C%AC%E7%AD%96%E7%95%A5"><span class="toc-number">1.2.4.</span> <span class="toc-text">Consumer 與 Provider 版本策略</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%9F%A9%E9%99%A3-Matrix"><span class="toc-number">1.3.</span> <span class="toc-text">矩陣 (Matrix)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9E%B6%E8%A8%AD-Pact-Broker"><span class="toc-number">2.</span> <span class="toc-text">架設 Pact Broker</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%9D%E6%8E%A2-Pact-Broker-UI"><span class="toc-number">3.</span> <span class="toc-text">初探 Pact Broker UI</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Pact-CLI"><span class="toc-number">4.</span> <span class="toc-text">Pact CLI</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%83%A8%E7%BD%B2%E5%A5%91%E7%B4%84"><span class="toc-number">4.1.</span> <span class="toc-text">部署契約</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%95%B4%E5%90%88%E5%A5%91%E7%B4%84%E9%A9%97%E8%AD%89"><span class="toc-number">5.</span> <span class="toc-text">整合契約驗證</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%B5%90%E8%AB%96"><span class="toc-number">6.</span> <span class="toc-text">結論</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/04/23/0006-nestjs-pact-broker/" title="NestJS 結合 Pact Broker 完善契約測試">NestJS 結合 Pact Broker 完善契約測試</a><time datetime="2025-04-23T14:40:00.000Z" title="發表於 2025-04-23 22:40:00">2025-04-23</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/03/08/0005-nestjs-pact/" title="在 NestJS 使用 Pact 實現契約測試">在 NestJS 使用 Pact 實現契約測試</a><time datetime="2025-03-08T09:20:00.000Z" title="發表於 2025-03-08 17:20:00">2025-03-08</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/02/23/0004-nestjs-valkey/" title="在 NestJS 使用 Valkey 實現 Cache">在 NestJS 使用 Valkey 實現 Cache</a><time datetime="2025-02-23T10:28:00.000Z" title="發表於 2025-02-23 18:28:00">2025-02-23</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/01/11/0003-what-is-krakend/" title="KrakenD 簡介">KrakenD 簡介</a><time datetime="2025-01-11T11:00:00.000Z" title="發表於 2025-01-11 19:00:00">2025-01-11</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/09/17/0002-nestjs-discovery-module/" title="你可能不知道的 NestJS 隱藏技巧：Discovery Module">你可能不知道的 NestJS 隱藏技巧：Discovery Module</a><time datetime="2023-09-17T09:35:00.000Z" title="發表於 2023-09-17 17:35:00">2023-09-17</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2023 - 2025 By HAO</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主題 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.3.5</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="閱讀模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日夜模式切換"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="單欄和雙欄切換"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="設定"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目錄"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到頂端"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"><script>(() => {
+  const runMermaid = ele => {
+    window.loadMermaid = true
+    const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+    ele.forEach((item, index) => {
+      const mermaidSrc = item.firstElementChild
+      const mermaidThemeConfig = `%%{init:{ 'theme':'${theme}'}}%%\n`
+      const mermaidID = `mermaid-${index}`
+      const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+
+      const renderFn = mermaid.render(mermaidID, mermaidDefinition)
+      const renderMermaid = svg => {
+        mermaidSrc.insertAdjacentHTML('afterend', svg)
+      }
+
+      // mermaid v9 and v10 compatibility
+      typeof renderFn === 'string' ? renderMermaid(renderFn) : renderFn.then(({ svg }) => renderMermaid(svg))
+    })
+  }
+
+  const codeToMermaid = () => {
+    const codeMermaidEle = document.querySelectorAll('pre > code.mermaid')
+    if (codeMermaidEle.length === 0) return
+
+    codeMermaidEle.forEach(ele => {
+      const preEle = document.createElement('pre')
+      preEle.className = 'mermaid-src'
+      preEle.hidden = true
+      preEle.textContent = ele.textContent
+      const newEle = document.createElement('div')
+      newEle.className = 'mermaid-wrap'
+      newEle.appendChild(preEle)
+      ele.parentNode.replaceWith(newEle)
+    })
+  }
+
+  const loadMermaid = () => {
+    if (false) codeToMermaid()
+    const $mermaid = document.querySelectorAll('#article-container .mermaid-wrap')
+    if ($mermaid.length === 0) return
+
+    const runMermaidFn = () => runMermaid($mermaid)
+    btf.addGlobalFn('themeChange', runMermaidFn, 'mermaid')
+    window.loadMermaid ? runMermaidFn() : btf.getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaidFn)
+  }
+
+  btf.addGlobalFn('encrypt', loadMermaid, 'mermaid')
+  window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+})()</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
