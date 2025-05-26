@@ -67,9 +67,11 @@ Custom CSS Highlight API 可以讓開發者在不改變 DOM 結構的情況下�
   const textNode = description.firstChild;
 
   // 建立 `Range` 物件，並將文字節點中的 `HAO` 標記出來
+  const startIndex = textNode.nodeValue.indexOf("HAO");
+  const endIndex = startIndex + 3;
   const range = document.createRange();
-  range.setStart(textNode, 21);
-  range.setEnd(textNode, 24);
+  range.setStart(textNode, startIndex);
+  range.setEnd(textNode, endIndex);
 
   // 建立 `Highlight` 物件，並將上方建立的 `Range` 物件透過 `add` 加入以便管理
   const highlight = new Highlight();
