@@ -1,0 +1,275 @@
+<!DOCTYPE html><html lang="zh-TW" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>用 Idle detection API 檢測用戶狀態 | HAO Lab</title><meta name="author" content="HAO"><meta name="copyright" content="HAO"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="有許多即時通訊軟體會顯示當前用戶的上線狀態，甚至會自動檢測用戶是否狀態為「離開」，像是：Microsoft Teams、Discord 等。若要使用 Web 技術實現自動檢測這件事情，第一個想到的可能是使用 Page Visibility API 來檢測「頁面是可見的還是隱藏的」，進而判斷是否要讓用戶呈現「離開」狀態。但如果使用者離開的定義是 使用者鎖定畫面或長時間沒有操作，這用 Page Vis">
+<meta property="og:type" content="article">
+<meta property="og:title" content="用 Idle detection API 檢測用戶狀態">
+<meta property="og:url" content="https://hao0731.github.io/2025/10/11/0010-idle-detection-api/index.html">
+<meta property="og:site_name" content="HAO Lab">
+<meta property="og:description" content="有許多即時通訊軟體會顯示當前用戶的上線狀態，甚至會自動檢測用戶是否狀態為「離開」，像是：Microsoft Teams、Discord 等。若要使用 Web 技術實現自動檢測這件事情，第一個想到的可能是使用 Page Visibility API 來檢測「頁面是可見的還是隱藏的」，進而判斷是否要讓用戶呈現「離開」狀態。但如果使用者離開的定義是 使用者鎖定畫面或長時間沒有操作，這用 Page Vis">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://hao0731.github.io/images/avatar.png">
+<meta property="article:published_time" content="2025-10-11T13:08:00.000Z">
+<meta property="article:modified_time" content="2025-10-11T13:09:01.873Z">
+<meta property="article:author" content="HAO">
+<meta property="article:tag" content="Frontend">
+<meta property="article:tag" content="Web APIs">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://hao0731.github.io/images/avatar.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "用 Idle detection API 檢測用戶狀態",
+  "url": "https://hao0731.github.io/2025/10/11/0010-idle-detection-api/",
+  "image": "https://hao0731.github.io/images/avatar.png",
+  "datePublished": "2025-10-11T13:08:00.000Z",
+  "dateModified": "2025-10-11T13:09:01.873Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "HAO",
+      "url": "https://hao0731.github.io/"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://hao0731.github.io/2025/10/11/0010-idle-detection-api/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><meta name="google-site-verification" content="KYrzVkRYnlmuWovSkb10DDpxXEZajsUmptjAy08v9kA"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          const mediaQueryDark = window.matchMedia('(prefers-color-scheme: dark)')
+          const mediaQueryLight = window.matchMedia('(prefers-color-scheme: light)')
+
+          if (theme === undefined) {
+            if (mediaQueryLight.matches) activateLightMode()
+            else if (mediaQueryDark.matches) activateDarkMode()
+            else {
+              const hour = new Date().getHours()
+              const isNight = hour <= 6 || hour >= 18
+              isNight ? activateDarkMode() : activateLightMode()
+            }
+            mediaQueryDark.addEventListener('change', () => {
+              if (saveToLocal.get('theme') === undefined) {
+                e.matches ? activateDarkMode() : activateLightMode()
+              }
+            })
+          } else {
+            theme === 'light' ? activateLightMode() : activateDarkMode()
+          }
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '複製成功',
+    error: '複製失敗',
+    noSupport: '瀏覽器不支援'
+  },
+  relativeDate: {
+    homepage: true,
+    post: true
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '剛剛',
+    min: '分鐘前',
+    hour: '小時前',
+    day: '天前',
+    month: '個月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '載入更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: true
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '用 Idle detection API 檢測用戶狀態',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/images/avatar.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">10</div></a><a href="/tags/"><div class="headline">標籤</div><div class="length-num">16</div></a><a href="/categories/"><div class="headline">分類</div><div class="length-num">14</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/about"><i class="fa-fw fas fa-user"></i><span> 關於我</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">HAO Lab</span></a><a class="nav-page-title" href="/"><span class="site-name">用 Idle detection API 檢測用戶狀態</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/about"><i class="fa-fw fas fa-user"></i><span> 關於我</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">用 Idle detection API 檢測用戶狀態</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">發表於</span><time class="post-meta-date-created" datetime="2025-10-11T13:08:00.000Z" title="發表於 2025-10-11 21:08:00">2025-10-11</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新於</span><time class="post-meta-date-updated" datetime="2025-10-11T13:09:01.873Z" title="更新於 2025-10-11 21:09:01">2025-10-11</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Frontend/">Frontend</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Frontend/Web-APIs/">Web APIs</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">瀏覽量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div><article class="container post-content" id="article-container"><p>有許多即時通訊軟體會顯示當前用戶的上線狀態，甚至會自動檢測用戶是否狀態為「離開」，像是：<a target="_blank" rel="noopener" href="https://www.microsoft.com/zh-tw/microsoft-teams/group-chat-software">Microsoft Teams</a>、<a target="_blank" rel="noopener" href="https://discord.com/">Discord</a> 等。若要使用 Web 技術實現自動檢測這件事情，第一個想到的可能是使用 <a target="_blank" rel="noopener" href="https://developer.mozilla.org/en-US/docs/Web/API/Page_Visibility_API">Page Visibility API</a> 來檢測「頁面是可見的還是隱藏的」，進而判斷是否要讓用戶呈現「離開」狀態。但如果使用者離開的定義是 <strong>使用者鎖定畫面或長時間沒有操作</strong>，這用 Page Visibility API 是無法精準判斷的，因為頁面的隱藏有可能是 <strong>最小化、切換分頁、鎖定畫面等情境</strong> 。如果要精準判斷鎖定畫面或是長時間沒有操作，可以考慮使用 <a target="_blank" rel="noopener" href="https://developer.mozilla.org/en-US/docs/Web/API/Idle_Detection_API">Idle Detection API</a>。</p>
+<h2 id="什麼是-Idle-Detection-API？"><a href="#什麼是-Idle-Detection-API？" class="headerlink" title="什麼是 Idle Detection API？"></a>什麼是 Idle Detection API？</h2><p>Idle Detection API 是 Chrome 在 94 版中添加的 API，該 API 可以檢測用戶是否處於閒置狀態，包含：是否鎖定畫面、使用者是否沒有跟鍵盤、滑鼠、螢幕互動等。這對於即時通訊軟體而言可說是非常有用的 API，即使用戶切換分頁、最小化視窗，只要還在操作就不會被判定是「離開」。</p>
+<blockquote>
+<p><strong>注意</strong>：該 API 目前只在 Chromium 系列的瀏覽器有支援，Firefox、Safari 因隱私和安全等考量並沒有跟進。詳細資訊可以參考「<a target="_blank" rel="noopener" href="https://www.ithome.com.tw/news/146874">Chrome 94添加存在隱私爭議的閒置偵測API，Firefox和Safari不跟進</a>」文章。也因為只有部分瀏覽器有支援，建議可以在程式碼中檢查該 API 是否可用，檢查的判斷式為：<code>if (&#39;IdleDetector&#39; in window) &#123; ... &#125;</code>。</p>
+</blockquote>
+<h2 id="使用-Idle-Detection-API"><a href="#使用-Idle-Detection-API" class="headerlink" title="使用 Idle Detection API"></a>使用 Idle Detection API</h2><p>下方是一段 Idle Detection API 的範例程式碼：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">async</span> <span class="keyword">function</span> <span class="title function_">detect</span>(<span class="params">func</span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> controller = <span class="keyword">new</span> <span class="title class_">AbortController</span>();</span><br><span class="line">  <span class="keyword">const</span> signal = controller.<span class="property">signal</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (!<span class="string">&#x27;IdleDetector&#x27;</span> <span class="keyword">in</span> <span class="variable language_">window</span>) &#123;</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">Error</span>(<span class="string">&#x27;Browser does not support idle detection.&#x27;</span>);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 向用戶提出權限許可</span></span><br><span class="line">  <span class="keyword">const</span> permission = <span class="keyword">await</span> <span class="title class_">IdleDetector</span>.<span class="title function_">requestPermission</span>();</span><br><span class="line">  <span class="keyword">if</span> (permission !== <span class="string">&#x27;granted&#x27;</span>) &#123;</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">Error</span>(<span class="string">&#x27;Idle detection permission denied.&#x27;</span>);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> idleDetector = <span class="keyword">new</span> <span class="title class_">IdleDetector</span>();</span><br><span class="line">  <span class="comment">// 當使用者長時間未操作或鎖定畫面時，會觸發此事件</span></span><br><span class="line">  idleDetector.<span class="title function_">addEventListener</span>(<span class="string">&#x27;change&#x27;</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> userState = idleDetector.<span class="property">userState</span>;     <span class="comment">// active or idle</span></span><br><span class="line">    <span class="keyword">const</span> screenState = idleDetector.<span class="property">screenState</span>; <span class="comment">// locked or unlocked</span></span><br><span class="line">    <span class="title function_">func</span>(&#123; userState, screenState &#125;);</span><br><span class="line">  &#125;);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">await</span> idleDetector.<span class="title function_">start</span>(&#123;</span><br><span class="line">    <span class="comment">// 設置閒置門檻為 60 秒</span></span><br><span class="line">    <span class="attr">threshold</span>: <span class="number">60</span> * <span class="number">1000</span>,</span><br><span class="line">    signal,</span><br><span class="line">  &#125;);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">function</span>(<span class="params"></span>) &#123;</span><br><span class="line">    controller.<span class="title function_">abort</span>();</span><br><span class="line">  &#125;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">async</span> <span class="keyword">function</span> <span class="title function_">main</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> unsubscribe = <span class="keyword">await</span> <span class="title function_">detect</span>(<span class="function">(<span class="params">&#123; userState, screenState &#125;</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`User state: <span class="subst">$&#123;userState&#125;</span>, Screen state: <span class="subst">$&#123;screenState&#125;</span>`</span>);</span><br><span class="line">  &#125;);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 要停止偵測時，可以調用該 function</span></span><br><span class="line">  <span class="comment">// unsubscribe();</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="title function_">main</span>();</span><br></pre></td></tr></table></figure>
+
+<p>當執行 <code>IdleDetector.requestPermission()</code> 時，瀏覽器會彈出下方權限許可畫面，用戶需要點擊「允許」才能夠使用 Idle Detection API：</p>
+<p><img
+  style="max-width: 500px;"
+  src="request-idle-detector-permission.png"
+  alt="Request idle detector permission"
+/></p>
+<p>當用戶允許後，就會開始檢測。由於 <code>threshold</code> 設置為 <code>60</code> 秒，當用戶閒置 <code>60</code> 秒時，會在 Console 印出狀態為 <code>idle</code>：</p>
+<p><img
+  style="max-width: 500px;"
+  src="user-state-idle.png"
+  alt="User state idle"
+/></p>
+<p>當用戶重新使用時，會在 Console 印出狀態為 <code>active</code>：</p>
+<p><img
+  style="max-width: 500px;"
+  src="user-state-active.png"
+  alt="User state active"
+/></p>
+<p>如果用戶鎖定畫面，會在 Console 印出狀態為 <code>locked</code>：</p>
+<p><img
+  style="max-width: 500px;"
+  src="screen-state-locked.png"
+  alt="Screen state locked"
+/></p>
+<p>如果用戶解除鎖定畫面，會在 Console 印出狀態為 <code>unlocked</code>：</p>
+<p><img
+  style="max-width: 500px;"
+  src="screen-state-unlocked.png"
+  alt="Screen state unlocked"
+/></p>
+<h2 id="用-DevTool-模擬"><a href="#用-DevTool-模擬" class="headerlink" title="用 DevTool 模擬"></a>用 DevTool 模擬</h2><p>Chrome 推出 Idle Detection API 的同時，也在 DevTool 新增了模擬閒置事件。可以透過「Sensors」分頁找到「Emulate Idle Detector state」區塊，在這裡可以針對四種情境進行切換：</p>
+<p><img
+  style="max-width: 500px;"
+  src="chrome-dev-tool-idle-detector.gif"
+  alt="Chrome dev tool idle detector"
+/></p>
+<h2 id="結論"><a href="#結論" class="headerlink" title="結論"></a>結論</h2><p>透過 Idle Detection API 可以更精準地判斷使用者是否處於閒置狀態，不過該 API 現在只有 Chromium 系列瀏覽器有支援，這對於需要同時支援多種瀏覽器的應用程式來說仍然需要用 Page Visibility API 當作 Fallback。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://hao0731.github.io">HAO</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章連結: </span><span class="post-copyright-info"><a href="https://hao0731.github.io/2025/10/11/0010-idle-detection-api/">https://hao0731.github.io/2025/10/11/0010-idle-detection-api/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版權聲明: </span><span class="post-copyright-info">本部落格所有文章除特別聲明外，均採用<a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 授權協議。轉載請註明來源 <a href="https://hao0731.github.io" target="_blank">HAO Lab</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Frontend/">Frontend</a><a class="post-meta__tags" href="/tags/Web-APIs/">Web APIs</a></div><div class="post-share"><div class="social-share" data-image="/images/avatar.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related full-width" href="/2025/07/12/0009-golang-air/" title="用 Air 實現 Live Reload 加速開發 Golang 應用"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">用 Air 實現 Live Reload 加速開發 Golang 應用</div></div><div class="info-2"><div class="info-item-1">前言在使用 Golang 進行開發時，每次修改程式碼後，都要手動停止執行中的程式並重啟，長期下來耗時又繁瑣，影響開發效率。為了解決這個問題，Golang 社群開發了 即時重載(Live Reload) 工具，其中 Air 是最受歡迎且簡單易用的工具之一。 什麼是 Air？Air 是一款用於 Golang 應用程式開發時的 Live Reload 工具，透過它自動偵測程式碼的變動來重新建置、重啟應用程式，讓開發者不需要手動中斷並重新執行 go build 或 go run 等指令，讓一切自動化處理進而提升開發效率。 安裝 Air官方提供了多種安裝的方法，如果 Golang 版本在 1.18 以上，可以直接透過 go install 指令進行安裝： 1$ go install github.com/air-verse/air@latest   補充：如果想透過 Docker Image 的方式來執行 Air，可以參考這個 Image。  安裝完畢後，可以透過下方指令查看 Air 的版本： 1$ air -v   快速上手開啟 Golang 專案並執行下方指令進行設定檔初始化： 1$...</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相關推薦</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2025/05/25/0007-highlight-search-keyword/" title="Highlight 表格搜尋關鍵字"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-05-25</div><div class="info-item-2">Highlight 表格搜尋關鍵字</div></div><div class="info-2"><div class="info-item-1">資料表格經常會有搜尋關鍵字的功能，當使用者在搜尋框輸入特定關鍵字時，資料表格會將符合該關鍵字的資料過濾出來，熱門的資料表格套件都有提供相關功能，像是：DataTables、Ag Grid 等。以下圖為例，Ag Grid 的 Quick Filter 功能可以讓使用者針對整個資料表格進行關鍵字查詢：  這個功能很方便，不過面對較複雜、欄位較多的資料表格時，就比較難一眼看出是哪個欄位有符合該關鍵字查詢。於是就出現了 高亮(Highlight) 關鍵字的搜尋功能，當使用者在輸入框輸入特定關鍵字時，資料表格內符合該關鍵字的文字會像使用 Ctrl + F 的搜尋方式一樣 加上底色，來強調文字。 傳統的 Highlight 解法要做到上述 Highlight 最直覺的做法是 在符合關鍵字的文字周圍動態插入 span 元素，假如本來的結構如下： 1234&lt;div class=&quot;row&quot;&gt;  &lt;div class=&quot;cell&quot;&gt;John&lt;/div&gt;  &lt;div...</div></div></div></a><a class="pagination-related" href="/2023/09/10/0001-dynamic-load-web-component/" title="動態載入 Web Component"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2023-09-10</div><div class="info-item-2">動態載入 Web Component</div></div><div class="info-2"><div class="info-item-1">什麼是 Web Component？Web Component 是一個封裝自定義元件的技術，讓我們可以輕易地在不同應用程式中重用這些被封裝的元件，不僅如此，Web Component 不限定應用程式使用的框架或函式庫，不論今天是 Angular 或 React，甚至是 Vanilla JavaScript 都能夠輕鬆使用。  INFO：關於 Web Component 的詳細資訊可以參考 MDN。  為什麼需要 Web Component？Web Component 的問世，可以實現較理想的 微前端（Micro Frontend） 概念，在過去，會以 iframe 的形式將其他團隊開發的元件、頁面嵌入至自己的系統內來實現微前端，但這樣的做法會有很多的限制，比如：跨域、生命週期等。 透過 Web Component 則可以避免這些問題，因為概念上就是將其他團隊開發的元件程式碼嵌入並串接至自己的系統裡。  NOTE：微前端也可以用 Module Federation 技術來實作，有興趣的話，可以參考相關文件。  動態載入 Web Component目前常見的 Web...</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/images/avatar.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">HAO</div><div class="author-info-description">樂於分享與熱愛學習的工程師</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">10</div></a><a href="/tags/"><div class="headline">標籤</div><div class="length-num">16</div></a><a href="/categories/"><div class="headline">分類</div><div class="length-num">14</div></a></div><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/hao0731" target="_blank" title="Github"><i class="fab fa-github" style="color: #hdhfbb;"></i></a><a class="social-icon" href="https://ithelp.ithome.com.tw/users/20119338" target="_blank" title="iT邦幫忙"><i class="fa-solid fa-globe" style="color: #000000;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">全世界第一本繁體中文 NestJS 入門書籍已上架，歡迎點擊<a target="_blank" rel="noopener" href="https://www.tenlong.com.tw/products/9786263332935">這裡</a>前往購買！</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目錄</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%80%E9%BA%BC%E6%98%AF-Idle-Detection-API%EF%BC%9F"><span class="toc-number">1.</span> <span class="toc-text">什麼是 Idle Detection API？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8-Idle-Detection-API"><span class="toc-number">2.</span> <span class="toc-text">使用 Idle Detection API</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%94%A8-DevTool-%E6%A8%A1%E6%93%AC"><span class="toc-number">3.</span> <span class="toc-text">用 DevTool 模擬</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%B5%90%E8%AB%96"><span class="toc-number">4.</span> <span class="toc-text">結論</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/10/11/0010-idle-detection-api/" title="用 Idle detection API 檢測用戶狀態">用 Idle detection API 檢測用戶狀態</a><time datetime="2025-10-11T13:08:00.000Z" title="發表於 2025-10-11 21:08:00">2025-10-11</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/07/12/0009-golang-air/" title="用 Air 實現 Live Reload 加速開發 Golang 應用">用 Air 實現 Live Reload 加速開發 Golang 應用</a><time datetime="2025-07-12T13:45:00.000Z" title="發表於 2025-07-12 21:45:00">2025-07-12</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/06/28/0008-golang-zog/" title="Zog 簡介">Zog 簡介</a><time datetime="2025-06-28T11:30:00.000Z" title="發表於 2025-06-28 19:30:00">2025-06-28</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/05/25/0007-highlight-search-keyword/" title="Highlight 表格搜尋關鍵字">Highlight 表格搜尋關鍵字</a><time datetime="2025-05-25T08:24:00.000Z" title="發表於 2025-05-25 16:24:00">2025-05-25</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/04/23/0006-nestjs-pact-broker/" title="NestJS 結合 Pact Broker 完善契約測試">NestJS 結合 Pact Broker 完善契約測試</a><time datetime="2025-04-23T14:40:00.000Z" title="發表於 2025-04-23 22:40:00">2025-04-23</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2023 - 2025 By HAO</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主題 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.3.5</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="閱讀模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日夜模式切換"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="單欄和雙欄切換"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="設定"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目錄"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到頂端"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"><script>(() => {
+  const runMermaid = ele => {
+    window.loadMermaid = true
+    const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+    ele.forEach((item, index) => {
+      const mermaidSrc = item.firstElementChild
+      const mermaidThemeConfig = `%%{init:{ 'theme':'${theme}'}}%%\n`
+      const mermaidID = `mermaid-${index}`
+      const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+
+      const renderFn = mermaid.render(mermaidID, mermaidDefinition)
+      const renderMermaid = svg => {
+        mermaidSrc.insertAdjacentHTML('afterend', svg)
+      }
+
+      // mermaid v9 and v10 compatibility
+      typeof renderFn === 'string' ? renderMermaid(renderFn) : renderFn.then(({ svg }) => renderMermaid(svg))
+    })
+  }
+
+  const codeToMermaid = () => {
+    const codeMermaidEle = document.querySelectorAll('pre > code.mermaid')
+    if (codeMermaidEle.length === 0) return
+
+    codeMermaidEle.forEach(ele => {
+      const preEle = document.createElement('pre')
+      preEle.className = 'mermaid-src'
+      preEle.hidden = true
+      preEle.textContent = ele.textContent
+      const newEle = document.createElement('div')
+      newEle.className = 'mermaid-wrap'
+      newEle.appendChild(preEle)
+      ele.parentNode.replaceWith(newEle)
+    })
+  }
+
+  const loadMermaid = () => {
+    if (false) codeToMermaid()
+    const $mermaid = document.querySelectorAll('#article-container .mermaid-wrap')
+    if ($mermaid.length === 0) return
+
+    const runMermaidFn = () => runMermaid($mermaid)
+    btf.addGlobalFn('themeChange', runMermaidFn, 'mermaid')
+    window.loadMermaid ? runMermaidFn() : btf.getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaidFn)
+  }
+
+  btf.addGlobalFn('encrypt', loadMermaid, 'mermaid')
+  window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+})()</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
