@@ -1,0 +1,344 @@
+<!DOCTYPE html><html lang="zh-TW" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>AI 時代下如何建立團隊的 AI 工作流 | HAO Lab</title><meta name="author" content="HAO"><meta name="copyright" content="HAO"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="前言AI Agent 的出現正在改變軟體工程師的工作方式。過去我們習慣把大量時間花在手寫程式碼、查文件、補測試、修 lint，但現在只要提供足夠清楚的目標與上下文，AI Agent 就可以在很短的時間內產出一大段可運作的程式碼。單純比較「打字產出速度」，人類工程師幾乎不可能追上 AI Agent。 但這不代表軟體工程師的價值會消失，反而是價值重心正在轉移。LLM 本身帶有隨機性，同一個需求在不同上">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AI 時代下如何建立團隊的 AI 工作流">
+<meta property="og:url" content="https://hao0731.github.io/2026/06/07/0012-ai-team-work/index.html">
+<meta property="og:site_name" content="HAO Lab">
+<meta property="og:description" content="前言AI Agent 的出現正在改變軟體工程師的工作方式。過去我們習慣把大量時間花在手寫程式碼、查文件、補測試、修 lint，但現在只要提供足夠清楚的目標與上下文，AI Agent 就可以在很短的時間內產出一大段可運作的程式碼。單純比較「打字產出速度」，人類工程師幾乎不可能追上 AI Agent。 但這不代表軟體工程師的價值會消失，反而是價值重心正在轉移。LLM 本身帶有隨機性，同一個需求在不同上">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://hao0731.github.io/images/avatar.png">
+<meta property="article:published_time" content="2026-06-07T08:50:00.000Z">
+<meta property="article:modified_time" content="2026-06-07T08:55:18.667Z">
+<meta property="article:author" content="HAO">
+<meta property="article:tag" content="AI">
+<meta property="article:tag" content="Software Engineering">
+<meta property="article:tag" content="Harness Engineering">
+<meta property="article:tag" content="Spec-Driven Development">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://hao0731.github.io/images/avatar.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "AI 時代下如何建立團隊的 AI 工作流",
+  "url": "https://hao0731.github.io/2026/06/07/0012-ai-team-work/",
+  "image": "https://hao0731.github.io/images/avatar.png",
+  "datePublished": "2026-06-07T08:50:00.000Z",
+  "dateModified": "2026-06-07T08:55:18.667Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "HAO",
+      "url": "https://hao0731.github.io/"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://hao0731.github.io/2026/06/07/0012-ai-team-work/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><meta name="google-site-verification" content="KYrzVkRYnlmuWovSkb10DDpxXEZajsUmptjAy08v9kA"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          const mediaQueryDark = window.matchMedia('(prefers-color-scheme: dark)')
+          const mediaQueryLight = window.matchMedia('(prefers-color-scheme: light)')
+
+          if (theme === undefined) {
+            if (mediaQueryLight.matches) activateLightMode()
+            else if (mediaQueryDark.matches) activateDarkMode()
+            else {
+              const hour = new Date().getHours()
+              const isNight = hour <= 6 || hour >= 18
+              isNight ? activateDarkMode() : activateLightMode()
+            }
+            mediaQueryDark.addEventListener('change', () => {
+              if (saveToLocal.get('theme') === undefined) {
+                e.matches ? activateDarkMode() : activateLightMode()
+              }
+            })
+          } else {
+            theme === 'light' ? activateLightMode() : activateDarkMode()
+          }
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '複製成功',
+    error: '複製失敗',
+    noSupport: '瀏覽器不支援'
+  },
+  relativeDate: {
+    homepage: true,
+    post: true
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '剛剛',
+    min: '分鐘前',
+    hour: '小時前',
+    day: '天前',
+    month: '個月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '載入更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: true
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'AI 時代下如何建立團隊的 AI 工作流',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/images/avatar.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">12</div></a><a href="/tags/"><div class="headline">標籤</div><div class="length-num">22</div></a><a href="/categories/"><div class="headline">分類</div><div class="length-num">19</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/about"><i class="fa-fw fas fa-user"></i><span> 關於我</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">HAO Lab</span></a><a class="nav-page-title" href="/"><span class="site-name">AI 時代下如何建立團隊的 AI 工作流</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/about"><i class="fa-fw fas fa-user"></i><span> 關於我</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">AI 時代下如何建立團隊的 AI 工作流</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">發表於</span><time class="post-meta-date-created" datetime="2026-06-07T08:50:00.000Z" title="發表於 2026-06-07 16:50:00">2026-06-07</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新於</span><time class="post-meta-date-updated" datetime="2026-06-07T08:55:18.667Z" title="更新於 2026-06-07 16:55:18">2026-06-07</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Software-Engineering/">Software Engineering</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Software-Engineering/AI/">AI</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">瀏覽量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div><article class="container post-content" id="article-container"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>AI Agent 的出現正在改變軟體工程師的工作方式。過去我們習慣把大量時間花在手寫程式碼、查文件、補測試、修 lint，但現在只要提供足夠清楚的目標與上下文，AI Agent 就可以在很短的時間內產出一大段可運作的程式碼。單純比較「打字產出速度」，人類工程師幾乎不可能追上 AI Agent。</p>
+<p>但這不代表軟體工程師的價值會消失，反而是價值重心正在轉移。LLM 本身帶有隨機性，同一個需求在不同上下文、不同提示、不同工具環境下，可能產出完全不同品質的結果。如果沒有一套可被團隊共同遵循的工作流，AI 產出的程式碼很容易變成「看起來很快，但後續很貴」的技術債。</p>
+<p>因此，在 AI 時代下，軟體工程師的核心價值會越來越像是在設計一條讓 AI 能正確行動的軌道：如何給足正確的 context、如何把團隊規範變成 AI 能理解的知識、如何讓錯誤可以被工具即時攔下、如何讓每次產出的經驗回饋成下一次更好的流程。換句話說，未來團隊競爭的重點不只是「誰比較會 prompt」，而是「誰能建立一套可被團隊共享、維護、迭代的 AI 工作流」。</p>
+<h2 id="流程概覽"><a href="#流程概覽" class="headerlink" title="流程概覽"></a>流程概覽</h2><p>本文定義的 AI 工作流會從 PRD 開始，逐步轉換成 User Story、Design document、Implementation plan，最後再交由 AI Agent 進行實作與 Code Review。這個流程的重點不是把原本的人類流程全部丟給 AI，而是把每個階段都變成「可追蹤、可審查、可迭代」的 context 資產。</p>
+<div class="mermaid-wrap"><pre class="mermaid-src" hidden>
+    flowchart TD
+    A[PRD] --&gt; B[PRD 轉 User Story]
+    B --&gt; C[User Story 轉 Design document]
+    C --&gt; D[產生 Implementation plan]
+    D --&gt; E[AI Agent 進行實作]
+    E --&gt; F[Code Review]
+    F --&gt; G[Merge &#x2F; Release]
+
+    S[Team Skills Library] -.-&gt; B
+    S -.-&gt; C
+    S -.-&gt; D
+    S -.-&gt; E
+    S -.-&gt; F
+
+    H[Harness Engineering] -.-&gt; E
+    F -. Feedback .-&gt; S
+    F -. Policy update .-&gt; H
+  </pre></div>
+
+<p>這裡最關鍵的一步是：團隊必須共同擁有、維護、迭代一套屬於團隊的 <strong>Skills</strong>。如果每個人都靠自己的 prompt、自己的筆記、自己的習慣來驅動 AI Agent，那團隊最後會得到很多風格不一致、品質不穩定、難以維護的產物。反過來說，如果團隊把產出 User Story、撰寫 Design document、產生 Implementation plan、發 PR、做 Code Review 等流程都沉澱成 Skills，就可以讓不同成員在不同任務上仍然用一致的方式協作。</p>
+<p>所以，AI 工作流的核心不是「讓 AI 寫更多 code」，而是「讓 AI 在團隊定義好的工程系統裡寫 code」。接下來會先介紹導入這套流程前需要具備的知識與工具，再逐步展開每個流程階段。</p>
+<h2 id="先備知識與工具"><a href="#先備知識與工具" class="headerlink" title="先備知識與工具"></a>先備知識與工具</h2><p>在導入 AI 工作流前，團隊需要先準備兩類東西：一類是讓 AI Agent 知道「該怎麼做」的前饋機制，另一類是讓 AI Agent 在做錯時能被攔下並修正的反饋機制。這也是 <strong>Harness Engineering</strong> 的核心思想。</p>
+<p>除此之外，團隊還需要建立 Skills 的管理方式，讓好的流程不只停留在某個人的 prompt 裡，而是可以被安裝、共享、版本控制與共同 review。最後，為了避免 AI Agent 直接從模糊需求跳到程式碼，我們會引入 <strong>Spec-Driven Development</strong> 的概念，讓每次實作都先有足夠清楚的規格與計畫。</p>
+<h3 id="Harness-Engineering"><a href="#Harness-Engineering" class="headerlink" title="Harness Engineering"></a>Harness Engineering</h3><p><strong>Harness Engineering</strong> 可以理解成替 AI Agent 建立一組工程護欄。AI Agent 很擅長根據上下文快速產出內容，但它不知道你們團隊偏好的 folder structure、命名規則、測試策略、錯誤處理方式，也不會天生知道哪些 legacy pattern 是不能再延續的。因此，我們需要把這些知識整理成 AI 可以讀取的 guide，並搭配工具檢查產出的結果。</p>
+<p>在這個思路下，AI Agent 不再是單純靠一段 prompt 自由發揮，而是被放進一個有文件、有命令、有測試、有 review 的環境裡工作。當 guide 寫得越清楚、sensor 設得越完整，AI Agent 的產出就越接近團隊想要的方向。</p>
+<h4 id="前饋機制-Guides-Feedforward"><a href="#前饋機制-Guides-Feedforward" class="headerlink" title="前饋機制 (Guides &#x2F; Feedforward)"></a>前饋機制 (Guides &#x2F; Feedforward)</h4><p>前饋機制的目標是在 AI Agent 開始實作前，先告訴它「這個專案的正確做法是什麼」。常見做法是把團隊規範整理在專案的 <code>docs/policies</code> 資料夾下，例如：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">.</span><br><span class="line">├── AGENTS.md</span><br><span class="line">└── docs</span><br><span class="line">    ├── policies</span><br><span class="line">    │   ├── coding-style.md</span><br><span class="line">    │   ├── folder-structure.md</span><br><span class="line">    │   ├── testing-policy.md</span><br><span class="line">    │   └── api-design.md</span><br><span class="line">    ├── designs</span><br><span class="line">    └── plans</span><br></pre></td></tr></table></figure>
+
+<p><code>docs/policies</code> 裡面可以放專案的 Coding Style、Folder structure、API 設計原則、測試策略、錯誤處理方式等內容。這些文件不需要寫成冗長的百科全書，重點是要清楚描述「團隊希望 AI Agent 遵守哪些規則」以及「遇到常見情境時應該怎麼選擇」。</p>
+<p>接著，在 <code>AGENTS.md</code> 中建立索引表，讓 AI Agent 一進到專案就知道要去哪裡讀取規範。例如：</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">## Project Policies</span></span><br><span class="line"></span><br><span class="line"><span class="bullet">-</span> [<span class="string">Coding Style</span>](<span class="link">docs/policies/coding-style.md</span>)</span><br><span class="line"><span class="bullet">-</span> [<span class="string">Folder Structure</span>](<span class="link">docs/policies/folder-structure.md</span>)</span><br><span class="line"><span class="bullet">-</span> [<span class="string">Testing Policy</span>](<span class="link">docs/policies/testing-policy.md</span>)</span><br><span class="line"><span class="bullet">-</span> [<span class="string">API Design</span>](<span class="link">docs/policies/api-design.md</span>)</span><br><span class="line"></span><br><span class="line"><span class="section">## Common Commands</span></span><br><span class="line"></span><br><span class="line"><span class="bullet">-</span> Lint: <span class="code">`npm run lint`</span></span><br><span class="line"><span class="bullet">-</span> Test: <span class="code">`npm test`</span></span><br><span class="line"><span class="bullet">-</span> Build: <span class="code">`npm run build`</span></span><br></pre></td></tr></table></figure>
+
+<p>這份 <code>AGENTS.md</code> 不應該塞滿所有規則，而是扮演索引與入口。真正的細節放在 <code>docs/policies</code>，讓 AI Agent 可以依任務需要逐步讀取。這樣可以避免 context 過度膨脹，也讓團隊在調整某個政策時，有明確的文件可以 review。</p>
+<h4 id="反饋機制-Sensors-Feedback"><a href="#反饋機制-Sensors-Feedback" class="headerlink" title="反饋機制 (Sensors &#x2F; Feedback)"></a>反饋機制 (Sensors &#x2F; Feedback)</h4><p>反饋機制的目標是在 AI Agent 產出錯誤時，讓錯誤盡早被工具攔下，而不是等到人類 Code Review 才發現。最基本的反饋機制包含：</p>
+<ul>
+<li><strong>Linter &#x2F; Formatter</strong>：檢查程式碼風格是否符合團隊規範。</li>
+<li><strong>Type check</strong>：確保型別與介面沒有被改壞。</li>
+<li><strong>Testing</strong>：透過 unit test、integration test、contract test 等方式驗證行為。</li>
+<li><strong>Build</strong>：確保產出的程式碼在實際建置流程中可用。</li>
+</ul>
+<p>這些檢查可以綁定在 Git hook 中，例如在 pre-commit 階段執行 formatter、linter 或相關測試，讓 AI Agent 產出的程式碼在 commit 前就先經過第一層防線。若 linter 可以自動修正格式問題，就讓工具直接修正；若測試失敗，AI Agent 可以根據錯誤訊息回頭修補。</p>
+<p>不過 Git hook 只能作為本地防線，CI 仍然是必要的第二層防線。尤其在多人協作與多服務專案中，本地環境可能不一致，CI 才是團隊共同信任的檢查結果。理想狀態下，AI Agent 實作完成後應該能主動執行 <code>lint</code>、<code>test</code>、<code>build</code>，並在 PR 描述中附上執行結果。</p>
+<h3 id="Skills-management"><a href="#Skills-management" class="headerlink" title="Skills management"></a>Skills management</h3><p>在個人使用 AI Agent 時，每個人維護自己的 prompt 或 Skills 可能還能接受；但在團隊協作中，如果每個人都維護一套自己的 Skills，很快就會遇到以下問題：</p>
+<ul>
+<li>大家產出的 User Story、Design document、PR 描述格式都不同。</li>
+<li>不同成員重複解決相同問題，卻沒有沉澱成團隊資產。</li>
+<li>Skills 的改善只服務個人習慣，無法以團隊協作為優先。</li>
+<li>新進成員需要靠口耳相傳學會團隊的 AI 使用方式。</li>
+</ul>
+<p>因此，團隊應該根據專案性質引入需要的 Skills，甚至建立一套屬於團隊自己的 Skill 庫。例如，團隊可以維護：</p>
+<ul>
+<li><code>prd-to-user-story</code>：將 PRD 轉成團隊固定格式的 User Story。</li>
+<li><code>user-story-to-design</code>：根據 User Story 產出 Design document。</li>
+<li><code>write-implementation-plan</code>：根據 Design document 產生 Implementation plan。</li>
+<li><code>create-pr</code>：依照團隊格式建立 PR。</li>
+<li><code>review-ai-pr</code>：針對 AI Agent 產出的 PR 做初步 Code Review。</li>
+</ul>
+<p>為了讓多個微服務專案共享相同的 Skills 庫，可以使用 Vercel 推出的 <a target="_blank" rel="noopener" href="https://www.skills.sh/docs/cli"><code>skills</code> CLI</a> 來安裝與管理 Skills。它支援從 GitHub repo、Git URL 或本地路徑安裝 Skills，也可以指定安裝到特定 AI Agent，例如 Codex、Claude Code、Cursor 等。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ npx skills add your-org/team-agent-skills --agent codex</span><br></pre></td></tr></table></figure>
+
+<p>如果團隊採用 project scope 安裝，就可以讓專案擁有自己的 Skills 版本。當 CLI 版本或團隊流程會產生 project-level lock file 時，建議將 <code>skills-lock.json</code> 一起 commit 到 repo 中，用來鎖定當前 Skills 的來源、版本或 hash。如此一來，團隊就可以透過 PR 來 review Skills 的更新，避免某個人默默升級 Skill 後導致產出結果改變。</p>
+<p>這個概念很像 <code>package-lock.json</code> 或 <code>go.sum</code>：我們不只要共享依賴，也要共享「AI Agent 如何工作的知識」。當 Skills 能被版本控制，團隊才有辦法真正做到共享、迭代與回溯。</p>
+<h3 id="Spec-Driven-Development"><a href="#Spec-Driven-Development" class="headerlink" title="Spec-Driven Development"></a>Spec-Driven Development</h3><p><strong>Spec-Driven Development</strong> 的核心思想是：在開始寫 code 前，先把需求、設計與實作計畫描述清楚。這件事在 AI 時代特別重要，因為 AI Agent 產出 code 的速度很快，如果規格模糊，它也會很快地把模糊需求擴散成大量模糊的程式碼。</p>
+<p>傳統開發流程中，工程師可能會把很多設計思考留在腦中，直接一邊寫 code 一邊調整。但對 AI Agent 來說，腦中的上下文不存在；如果沒有明確的 User Story、Design document、Implementation plan，它很容易用自己的假設補洞。這些假設有時候合理，有時候卻會和團隊架構或產品需求衝突。</p>
+<p>為了導入這個流程，可以使用 <a target="_blank" rel="noopener" href="https://github.com/obra/superpowers">superpowers</a> 這類 Skills 庫。superpowers 是一套針對 AI coding agents 設計的工程方法論與 Skills 集合，提供像是 brainstorming、writing-plans、test-driven-development、systematic-debugging、requesting-code-review 等能力。它的價值不是讓 AI 變得更會「猜」，而是讓 AI 依照更有紀律的流程工作。</p>
+<p>在本文的流程中，我們會借用 superpowers 的思路：先透過 brainstorming 釐清需求，再把需求轉成 Design document，接著產生 Implementation plan，最後才開始實作與 review。這能讓 AI Agent 的每一步都有明確依據，也讓團隊可以在更早的階段發現問題。</p>
+<h2 id="流程介紹"><a href="#流程介紹" class="headerlink" title="流程介紹"></a>流程介紹</h2><h3 id="PRD-轉-User-Story"><a href="#PRD-轉-User-Story" class="headerlink" title="PRD 轉 User Story"></a>PRD 轉 User Story</h3><p>團隊的 PRD 可能放在 Google Docs、Notion、Confluence，甚至公司內部文件庫中。導入 AI 工作流後，第一步不是把 PRD 複製貼上給 AI 後直接叫它寫 code，而是先透過 MCP 或 Skill 將 PRD 內容拉到 AI Agent 的工作環境中，並轉換成團隊固定格式的 User Story。</p>
+<p>這裡可以維護一個團隊專用的 <code>prd-to-user-story</code> Skill，要求每次產出的 User Story 都必須包含固定欄位，例如：</p>
+<ul>
+<li><strong>Background</strong>：為什麼要做這個需求？解決什麼問題？</li>
+<li><strong>Requirement</strong>：使用者或系統實際需要什麼能力？</li>
+<li><strong>Acceptance Criteria (AC)</strong>：怎樣才算完成？有哪些可驗收條件？</li>
+<li><strong>Out of Scope</strong>：這次明確不做什麼？</li>
+<li><strong>Open Questions</strong>：PRD 中仍不清楚或互相矛盾的地方。</li>
+</ul>
+<p>在這個階段，AI Agent 很適合用來找出 PRD 裡不清楚、矛盾或缺少驗收條件的地方。例如同一份 PRD 可能同時寫了「使用者可以修改資料」與「送出後不可編輯」，這時 AI Agent 應該要把它列成 Open Question，而不是自行猜測產品想要哪一種行為。</p>
+<p>若需求還不夠清楚，也可以透過 superpowers 的 brainstorming skill 輔助，讓 AI Agent 先提出問題、選項與取捨，再由 PM、Tech Lead 或負責該功能的工程師確認。產生好的 User Story 可以手動貼回專案管理軟體，也可以透過 Skill 或 MCP 在 Jira、Linear 等工具中建立 Ticket。</p>
+<h3 id="User-Story-轉-Design-document"><a href="#User-Story-轉-Design-document" class="headerlink" title="User Story 轉 Design document"></a>User Story 轉 Design document</h3><p>User Story 確認後，下一步是將它轉成 Design document。這時可以透過 MCP 或 Skill 從 Jira 等專案管理軟體載入 User Story，再交給 AI Agent 產出設計文件。Design document 應該統一放在專案的 <code>docs/designs</code> 資料夾下，例如：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">docs</span><br><span class="line">└── designs</span><br><span class="line">    ├── user-permission-audit-log.md</span><br><span class="line">    └── order-refund-flow.md</span><br></pre></td></tr></table></figure>
+
+<p>Design document 不是流水帳，也不是做完就丟掉的紀錄，而是專案的重要 context 資產。它應該描述這次功能的設計背景、系統邊界、資料流、API 變更、資料庫變更、測試策略、風險與取捨。未來當功能迭代、架構調整或 bug 修正時，也應該回頭更新相關 Design document。</p>
+<p>這麼做的好處是，AI Agent 之後在處理同一個領域的任務時，可以讀取既有 Design document，理解當初為什麼這樣設計，而不是只看目前的程式碼表面。對人類工程師來說，Design document 也能降低 onboarding 成本，讓新成員更快理解系統脈絡。</p>
+<h3 id="產生-Implementation-plan"><a href="#產生-Implementation-plan" class="headerlink" title="產生 Implementation plan"></a>產生 Implementation plan</h3><p>有了 Design document 後，才進入 Implementation plan。這個階段可以透過 superpowers 的 writing-plans 類型流程，要求 AI Agent 根據這次迭代的 Design 產生具體的實作計畫。</p>
+<p>我的做法是將尚未真正實作的 plan 統一放在 <code>docs/plans/active</code>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">docs</span><br><span class="line">└── plans</span><br><span class="line">    ├── active</span><br><span class="line">    │   └── 2026-06-07-user-permission-audit-log-plan.md</span><br><span class="line">    └── completed</span><br></pre></td></tr></table></figure>
+
+<p>Implementation plan 應該包含這次會修改哪些模組、預期新增哪些檔案、每個 task 的順序、需要補哪些測試、如何驗證、有哪些風險與 rollback 方式。它不需要細到每一行 code 怎麼寫，但必須細到 AI Agent 可以依照 plan 逐步執行，而不是邊做邊猜。</p>
+<p>plan 產生後，應該先由產生該 plan 的人 review，並持續與 AI Agent 溝通改善方案。例如，要求 AI Agent 拆小任務、補測試策略、確認資料庫 migration 風險、避免一次修改太多不相關檔案。確認沒問題後，可以發 PR 讓團隊共同 review 這份 plan 是否合理。</p>
+<p>這一步很值得花時間，因為 review plan 的成本遠低於 review 一大包已經寫完的程式碼。如果設計方向錯了，在 plan 階段修正只需要改文件；如果等 AI Agent 寫完幾千行 code 才發現方向錯了，成本就會高很多。</p>
+<h3 id="AI-Agent-進行實作"><a href="#AI-Agent-進行實作" class="headerlink" title="AI Agent 進行實作"></a>AI Agent 進行實作</h3><p>Implementation plan 通過 review 後，AI Agent 才正式開始實作。這時候 AI Agent 應該根據 <code>docs/plans/active</code> 中的 plan 逐步處理任務，並在過程中讀取 <code>AGENTS.md</code>、<code>docs/policies</code>、相關 Design document 與團隊 Skills。</p>
+<p>在實作階段，前面設置的 Git hook 就會開始發揮作用。每次 AI Agent 修改程式碼並準備 commit 時，pre-commit 可以先執行 formatter、linter 或部分測試，提早攔下明顯違反 policy 的程式碼。如果檢查失敗，AI Agent 應該根據錯誤訊息修正，而不是跳過 hook 或關閉檢查。</p>
+<p>實務上，不建議讓 AI Agent 一次完成太大的變更。比較好的方式是依照 Implementation plan 的 task 拆分實作，每完成一個小段落就執行對應驗證。這能降低上下文失控的機率，也讓人類更容易 review。</p>
+<p>當實作完成後，AI Agent 應該執行專案定義的 <code>lint</code>、<code>test</code>、<code>build</code> 等命令，確認結果後再將 implementation plan 從 <code>docs/plans/active</code> 移到 <code>docs/plans/completed</code>。這個動作代表該 plan 已經完成，不再是待執行狀態，也方便未來回頭查找某個功能當初是如何落地的。</p>
+<h3 id="Code-Review"><a href="#Code-Review" class="headerlink" title="Code Review"></a>Code Review</h3><p>AI Agent 實作完成後，可以透過 MCP、Skill 或 CLI 協助建立 PR。PR 描述中應該包含 User Story、Design document、Implementation plan 的連結，以及本地執行過的驗證命令與結果。這樣 reviewer 不需要從一大段 diff 裡反推需求，而是可以沿著 context 從需求一路看回實作。</p>
+<p>在 Code Review 階段，可以引入 AI Code Review 機制協助處理第一層檢查，例如：</p>
+<ul>
+<li>是否有明顯的效能問題，如 N + 1 query、多餘迴圈、重複 I&#x2F;O。</li>
+<li>是否有依照 Implementation plan 實作，而不是多做或漏做。</li>
+<li>是否缺少測試或驗收條件沒有被覆蓋。</li>
+<li>是否違反 <code>docs/policies</code> 中定義的架構與風格。</li>
+<li>是否出現不必要的大範圍重構。</li>
+</ul>
+<p>這些檢查可以降低人類 reviewer 的負擔，讓人類把時間留給更高層次的判斷，例如：這個設計是否真的符合產品目標？是否引入長期維護風險？是否有安全或資料一致性的問題？</p>
+<p>但 AI Code Review 不應該被理解成「人類不用 review」。AI 可以幫忙找出明顯問題，也可以確認實作是否對齊 plan，但最終的工程判斷、產品取捨與責任仍然需要人類承擔。特別是當 AI Review 一再指出同類問題時，團隊不應該只是在單次 PR 中修掉，而是要回頭更新 Skills、<code>docs/policies</code> 或測試工具，讓同樣的錯誤下次更早被攔住。</p>
+<h2 id="結論"><a href="#結論" class="headerlink" title="結論"></a>結論</h2><p>AI Agent 讓程式碼產出速度大幅提升，但真正決定團隊效率的，不是單次生成了多少 code，而是 <strong>團隊能不能建立一套穩定、可重複、可審查的工作流</strong>。沒有 context、規格與工具防線的 AI 開發，很容易只是把技術債產生得更快。</p>
+<p>本文介紹的流程從 PRD、User Story、Design document、Implementation plan 到實作與 Code Review，目的就是把模糊需求逐步轉成可被 AI Agent 正確執行的工程資產。其中，團隊共享的 Skills、<code>AGENTS.md</code>、<code>docs/policies</code>、Git hook、測試與 CI，都是讓 AI 從「自由發揮」變成「受控協作」的重要機制。</p>
+<p>未來軟體工程師的價值，會越來越體現在如何設計這些機制、維護團隊知識、判斷 AI 產出的正確性，並把每次協作的經驗回饋到下一次更好的流程裡。AI 不會取代工程紀律，反而會放大工程紀律的重要性。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://hao0731.github.io">HAO</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章連結: </span><span class="post-copyright-info"><a href="https://hao0731.github.io/2026/06/07/0012-ai-team-work/">https://hao0731.github.io/2026/06/07/0012-ai-team-work/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版權聲明: </span><span class="post-copyright-info">本部落格所有文章除特別聲明外，均採用<a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 授權協議。轉載請註明來源 <a href="https://hao0731.github.io" target="_blank">HAO Lab</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/AI/">AI</a><a class="post-meta__tags" href="/tags/Software-Engineering/">Software Engineering</a><a class="post-meta__tags" href="/tags/Harness-Engineering/">Harness Engineering</a><a class="post-meta__tags" href="/tags/Spec-Driven-Development/">Spec-Driven Development</a></div><div class="post-share"><div class="social-share" data-image="/images/avatar.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related full-width" href="/2026/01/05/0011-temporal-orchestration-saga/" title="用 Temporal 實現 Orchestration Saga"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">用 Temporal 實現 Orchestration Saga</div></div><div class="info-2"><div class="info-item-1">實現 Orchestration Saga 的挑戰在 微服務（Microservices） 的架構下，要確保跨多個服務的資料一致性，一直是開發者心中的痛。過去在 單體式架構（Monolithic） 裡，我們有強大的 ACID 資料庫 事務（Transaction） 罩著我們，但在分散式系統中，這道防護網消失了。雖然 二階段提交（2PC, Two-Phase Commit） 曾經是標準答案，但在高併發的網路世界裡，它就像是在尖峰時刻封鎖十字路口一樣——鎖定資源的時間太長，導致整體系統效能低落，甚至容易引發 死鎖（Deadlock）。因此， Saga Pattern 成為了現代的主流選擇：透過一連串的 本地事務（Local Transactions） 與 補償機制（Compensating Actions） 來達成 「最終一致性」。   補充：關於 Saga 的介紹，可以參考我在鐵人賽中撰寫的文章。  然而，知道 Saga 是一回事，要實作它又是另一回事。如果嘗試不依賴任何框架，徒手寫程式碼來實現 Orchestration Saga 會發現自己很快就陷入了...</div></div></div></a></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/images/avatar.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">HAO</div><div class="author-info-description">樂於分享與熱愛學習的工程師</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">12</div></a><a href="/tags/"><div class="headline">標籤</div><div class="length-num">22</div></a><a href="/categories/"><div class="headline">分類</div><div class="length-num">19</div></a></div><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/hao0731" target="_blank" title="Github"><i class="fab fa-github" style="color: #hdhfbb;"></i></a><a class="social-icon" href="https://ithelp.ithome.com.tw/users/20119338" target="_blank" title="iT邦幫忙"><i class="fa-solid fa-globe" style="color: #000000;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">全世界第一本繁體中文 NestJS 入門書籍已上架，歡迎點擊<a target="_blank" rel="noopener" href="https://www.tenlong.com.tw/products/9786263332935">這裡</a>前往購買！</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目錄</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B5%81%E7%A8%8B%E6%A6%82%E8%A6%BD"><span class="toc-number">2.</span> <span class="toc-text">流程概覽</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%88%E5%82%99%E7%9F%A5%E8%AD%98%E8%88%87%E5%B7%A5%E5%85%B7"><span class="toc-number">3.</span> <span class="toc-text">先備知識與工具</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Harness-Engineering"><span class="toc-number">3.1.</span> <span class="toc-text">Harness Engineering</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%89%8D%E9%A5%8B%E6%A9%9F%E5%88%B6-Guides-Feedforward"><span class="toc-number">3.1.1.</span> <span class="toc-text">前饋機制 (Guides &#x2F; Feedforward)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8F%8D%E9%A5%8B%E6%A9%9F%E5%88%B6-Sensors-Feedback"><span class="toc-number">3.1.2.</span> <span class="toc-text">反饋機制 (Sensors &#x2F; Feedback)</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Skills-management"><span class="toc-number">3.2.</span> <span class="toc-text">Skills management</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Spec-Driven-Development"><span class="toc-number">3.3.</span> <span class="toc-text">Spec-Driven Development</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B5%81%E7%A8%8B%E4%BB%8B%E7%B4%B9"><span class="toc-number">4.</span> <span class="toc-text">流程介紹</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#PRD-%E8%BD%89-User-Story"><span class="toc-number">4.1.</span> <span class="toc-text">PRD 轉 User Story</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#User-Story-%E8%BD%89-Design-document"><span class="toc-number">4.2.</span> <span class="toc-text">User Story 轉 Design document</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%94%A2%E7%94%9F-Implementation-plan"><span class="toc-number">4.3.</span> <span class="toc-text">產生 Implementation plan</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#AI-Agent-%E9%80%B2%E8%A1%8C%E5%AF%A6%E4%BD%9C"><span class="toc-number">4.4.</span> <span class="toc-text">AI Agent 進行實作</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Code-Review"><span class="toc-number">4.5.</span> <span class="toc-text">Code Review</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%B5%90%E8%AB%96"><span class="toc-number">5.</span> <span class="toc-text">結論</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/06/07/0012-ai-team-work/" title="AI 時代下如何建立團隊的 AI 工作流">AI 時代下如何建立團隊的 AI 工作流</a><time datetime="2026-06-07T08:50:00.000Z" title="發表於 2026-06-07 16:50:00">2026-06-07</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/01/05/0011-temporal-orchestration-saga/" title="用 Temporal 實現 Orchestration Saga">用 Temporal 實現 Orchestration Saga</a><time datetime="2026-01-05T13:00:00.000Z" title="發表於 2026-01-05 21:00:00">2026-01-05</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/10/11/0010-idle-detection-api/" title="用 Idle detection API 檢測用戶狀態">用 Idle detection API 檢測用戶狀態</a><time datetime="2025-10-11T13:08:00.000Z" title="發表於 2025-10-11 21:08:00">2025-10-11</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/07/12/0009-golang-air/" title="用 Air 實現 Live Reload 加速開發 Golang 應用">用 Air 實現 Live Reload 加速開發 Golang 應用</a><time datetime="2025-07-12T13:45:00.000Z" title="發表於 2025-07-12 21:45:00">2025-07-12</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/06/28/0008-golang-zog/" title="Zog 簡介">Zog 簡介</a><time datetime="2025-06-28T11:30:00.000Z" title="發表於 2025-06-28 19:30:00">2025-06-28</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2023 - 2026 By HAO</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主題 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.3.5</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="閱讀模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日夜模式切換"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="單欄和雙欄切換"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="設定"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目錄"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到頂端"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"><script>(() => {
+  const runMermaid = ele => {
+    window.loadMermaid = true
+    const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+    ele.forEach((item, index) => {
+      const mermaidSrc = item.firstElementChild
+      const mermaidThemeConfig = `%%{init:{ 'theme':'${theme}'}}%%\n`
+      const mermaidID = `mermaid-${index}`
+      const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+
+      const renderFn = mermaid.render(mermaidID, mermaidDefinition)
+      const renderMermaid = svg => {
+        mermaidSrc.insertAdjacentHTML('afterend', svg)
+      }
+
+      // mermaid v9 and v10 compatibility
+      typeof renderFn === 'string' ? renderMermaid(renderFn) : renderFn.then(({ svg }) => renderMermaid(svg))
+    })
+  }
+
+  const codeToMermaid = () => {
+    const codeMermaidEle = document.querySelectorAll('pre > code.mermaid')
+    if (codeMermaidEle.length === 0) return
+
+    codeMermaidEle.forEach(ele => {
+      const preEle = document.createElement('pre')
+      preEle.className = 'mermaid-src'
+      preEle.hidden = true
+      preEle.textContent = ele.textContent
+      const newEle = document.createElement('div')
+      newEle.className = 'mermaid-wrap'
+      newEle.appendChild(preEle)
+      ele.parentNode.replaceWith(newEle)
+    })
+  }
+
+  const loadMermaid = () => {
+    if (false) codeToMermaid()
+    const $mermaid = document.querySelectorAll('#article-container .mermaid-wrap')
+    if ($mermaid.length === 0) return
+
+    const runMermaidFn = () => runMermaid($mermaid)
+    btf.addGlobalFn('themeChange', runMermaidFn, 'mermaid')
+    window.loadMermaid ? runMermaidFn() : btf.getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaidFn)
+  }
+
+  btf.addGlobalFn('encrypt', loadMermaid, 'mermaid')
+  window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+})()</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
